@@ -61,9 +61,14 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
     train_addrs = []
     val_addrs = []
     
+    if config.split_test_train:
+        split = config.split
+    else:
+        split = 99999
+        
     for folder in os.listdir(input_folder):
         folder_path = os.path.join(input_folder, folder)
-        if count % 2 == 0:
+        if count % split == 0:
             #validation
             path = os.path.join(folder_path, '*.png')
             for file in glob.glob(path):
