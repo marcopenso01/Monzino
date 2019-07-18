@@ -155,4 +155,4 @@ if __name__ == '__main__':
     input_folder = '/content/drive/My Drive/train'
     preprocessing_folder = '/content/drive/My Drive/preproc_data'
 
-    d=load_and_maybe_process_data(input_folder, preprocessing_folder, '2D', config.size, config.target_resolution)
+    d=load_and_maybe_process_data(input_folder, preprocessing_folder, '2D', config.image_size, config.target_resolution)
