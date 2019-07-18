@@ -84,7 +84,8 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
     train_shape = (len(train_addrs), nx, ny)
     val_shape = (len(val_addrs), nx, ny)
     hdf5_file.create_dataset("images_train", train_shape, np.uint8)
-    hdf5_file.create_dataset("images_val", val_shape, np.uint8)
+    if config.split_test_train:
+        hdf5_file.create_dataset("images_val", val_shape, np.uint8)
     
     for i in range(len(train_addrs)):
         addr = train_addrs[i]
@@ -92,12 +93,14 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
         #img = cv2.resize(img, (nx, ny), interpolation=cv2.INTER_CUBIC)
         img = crop_or_pad_slice_to_size(img, nx, ny)
         hdf5_file["images_train"][i, ...] = img[None]
-    for i in range(len(val_addrs)):
-        addr = val_addrs[i]
-        img = cv2.imread(addr,0)
-        #img = cv2.resize(img, (nx, ny), interpolation=cv2.INTER_CUBIC)
-        img = crop_or_pad_slice_to_size(img, nx, ny)
-        hdf5_file["images_val"][i, ...] = img[None]   
+    
+    if config.split_test_train:
+        for i in range(len(val_addrs)):
+            addr = val_addrs[i]
+            img = cv2.imread(addr,0)
+            #img = cv2.resize(img, (nx, ny), interpolation=cv2.INTER_CUBIC)
+            img = crop_or_pad_slice_to_size(img, nx, ny)
+            hdf5_file["images_val"][i, ...] = img[None]   
 
             
     # After test train loop:
