@@ -26,8 +26,8 @@ skip_connections = True
 
 # Data settings
 data_mode = '2D' 
-image_size = (216, 216)   #(212,212)
-target_resolution = (1.36719, 1.36719)
+image_size = (206, 206)   #(212,212)
+target_resolution = (1, 1)
 pixel_size = (1,1) 
 nlabels = 4
 split_test_train = True   #divide patients in train and test. If true define split
