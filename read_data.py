@@ -152,7 +152,7 @@ def load_and_maybe_process_data(input_folder,
 
 if __name__ == '__main__':
 
-    input_folder = '/content/drive/My Drive/train'
-    preprocessing_folder = '/content/drive/My Drive/preproc_data'
+    input_folder = config.data_root
+    preprocessing_folder = config.preprocessing_folder
 
     d=load_and_maybe_process_data(input_folder, preprocessing_folder, '2D', config.image_size, config.target_resolution)
