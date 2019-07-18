@@ -28,6 +28,7 @@ skip_connections = True
 data_mode = '2D' 
 image_size = (216, 216)   #(212,212)
 target_resolution = (1.36719, 1.36719)
+pixel_size = (1,1) 
 nlabels = 4
 split_test_train = True   #divide patients in train and test. If true define split
 split = 2                 #  2: 50%,    5: 80% training, 20% test
