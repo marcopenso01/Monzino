@@ -1,4 +1,4 @@
-import model_structure
+# import model_structure
 import tensorflow as tf
 import os
 import socket
