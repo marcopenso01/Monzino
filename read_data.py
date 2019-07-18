@@ -57,6 +57,7 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
     hdf5_file = h5py.File(output_file, "w")
 
     nx, ny = size
+    scale_vector = [config.pixel_size[0] / target_resolution[0], config.pixel_size[1] / target_resolution[1]]
     count = 1
     train_addrs = []
     val_addrs = []
@@ -90,6 +91,12 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
     for i in range(len(train_addrs)):
         addr = train_addrs[i]
         img = cv2.imread(addr,0)
+        img = transform.rescale(img,
+                                scale_vector,
+                                order=1,
+                                preserve_range=True,
+                                multichannel=False,
+                                mode = 'constant')
         #img = cv2.resize(img, (nx, ny), interpolation=cv2.INTER_CUBIC)
         img = crop_or_pad_slice_to_size(img, nx, ny)
         hdf5_file["images_train"][i, ...] = img[None]
@@ -98,6 +105,12 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
         for i in range(len(val_addrs)):
             addr = val_addrs[i]
             img = cv2.imread(addr,0)
+            img = transform.rescale(img,
+                                    scale_vector,
+                                    order=1,
+                                    preserve_range=True,
+                                    multichannel=False,
+                                    mode = 'constant')
             #img = cv2.resize(img, (nx, ny), interpolation=cv2.INTER_CUBIC)
             img = crop_or_pad_slice_to_size(img, nx, ny)
             hdf5_file["images_val"][i, ...] = img[None]   
@@ -142,4 +155,4 @@ if __name__ == '__main__':
     input_folder = '/content/drive/My Drive/train'
     preprocessing_folder = '/content/drive/My Drive/preproc_data'
 
-    d=load_and_maybe_process_data(input_folder, preprocessing_folder, '2D', (206,206), (1, 1))
+    d=load_and_maybe_process_data(input_folder, preprocessing_folder, '2D', config.size, config.target_resolution)
