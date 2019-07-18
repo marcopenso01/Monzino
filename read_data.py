@@ -84,9 +84,9 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
     
     train_shape = (len(train_addrs), nx, ny)
     val_shape = (len(val_addrs), nx, ny)
-    hdf5_file.create_dataset("images_train", train_shape, np.uint8)
+    hdf5_file.create_dataset("images_train", train_shape, np.float32)
     if config.split_test_train:
-        hdf5_file.create_dataset("images_val", val_shape, np.uint8)
+        hdf5_file.create_dataset("images_val", val_shape, np.float32)
     
     for i in range(len(train_addrs)):
         addr = train_addrs[i]
