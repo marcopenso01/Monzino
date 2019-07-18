@@ -37,30 +37,6 @@ def standardize_image(image):
     s = np.std(img_o)
     return np.divide((img_o - m), s)
 
-def equalization_image(image):
-    '''
-    histogram equalization
-    '''
-    img_equalized = cv2.equalizeHist(image)
-    return img_equalized
-
-def CLAHE(image):
-    '''
-    Contrast Limited Adaptive Histogram Equalization
-    The first histogram equalization we just saw, considers the global contrast of the image. 
-    In many cases, it is not a good idea. 
-    Image is divided into small blocks called "tiles" (tileSize is 8x8 by default in OpenCV).
-    Then each of these blocks are histogram equalized as usual. So in a small area, histogram
-    would confine to a small region (unless there is noise). If noise is there, it will be 
-    amplified. To avoid this, contrast limiting is applied. If any histogram bin is above the
-    specified contrast limit (by default 40 in OpenCV), those pixels are clipped and 
-    distributed uniformly to other bins before applying histogram equalization. After 
-    equalization, to remove artifacts in tile borders, bilinear interpolation is applied.
-    '''
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
-    img_equalized = clahe.apply(image)
-    return img_equalized
-    
 
 def normalize_image(image):
     '''
