@@ -92,6 +92,10 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
         addr = train_addrs[i]
         img = cv2.imread(addr,0)
         '''
+        if config.standardize:
+            img = image_utils.standardize_image(img)
+        if config.normalize:
+            img = cv2.normalize(img, dst=None, alpha=config.min, beta=config.max, norm_type=cv2.NORM_MINMAX)
         img = transform.rescale(img,
                                 scale_vector,
                                 order=1,
@@ -108,6 +112,10 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
             addr = val_addrs[i]
             img = cv2.imread(addr,0)
             '''
+            if config.standardize:
+                img = image_utils.standardize_image(img)
+            if config.normalize:
+                img = cv2.normalize(img, dst=None, alpha=config.min, beta=config.max, norm_type=cv2.NORM_MINMAX)
             img = transform.rescale(img,
                                     scale_vector,
                                     order=1,
