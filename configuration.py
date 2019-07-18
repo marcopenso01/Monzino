@@ -91,8 +91,6 @@ standardize = False
 normalize = True
 min = -1
 max = 1
-equalize = False
-clahe = False
 
 # Rarely changed settings
 use_data_fraction = False  # Should normally be False
