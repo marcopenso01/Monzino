@@ -25,11 +25,12 @@ iniz = tf.contrib.layers.variance_scaling_initializer(uniform=False)  #he_normal
 skip_connections = True
 
 # Data settings
-data_mode = '2D'  # 2D or 3D
+data_mode = '2D' 
 image_size = (216, 216)   #(212,212)
 target_resolution = (1.36719, 1.36719)
 nlabels = 4
-split_test_train = True   #divide data in train (80%) and test (20%)
+split_test_train = True   #divide patients in train and test
+split = 2                 #  2: 50%,    5: 80% training, 20% test
 train_on_all_data = False 
 
 # Training settings
