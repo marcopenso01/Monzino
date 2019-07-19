@@ -61,6 +61,8 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
     count = 1
     train_addrs = []
     val_addrs = []
+    masktrain_addrs = []
+    maskval_addrs = []
     
     # se split_test_train è True allora splitto tra train e validation i pazienti. Quando faccio il test, 
     # split_test_train deve essere False. Split mi dive ogni quanti pazienti vanno in validation. Con 2, il 50% sono divisi. 
@@ -70,31 +72,49 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
         split = config.split
     else:
         split = 99999
-        
-    for folder in os.listdir(input_folder):
-        folder_path = os.path.join(input_folder, folder)
+    
+    path_img = os.path.join(input_folder, 'img')
+    path_mask = os.path.join(input_folder, 'mask')
+    for folders_img, folders_mask in zip(os.listdir(path_img), os.listdir(path_mask)):
+        folder_path_img = os.path.join(path_img, folders_img)
+        folder_path_mask = os.path.join(path_mask, folders_mask)
         if count % split == 0:
             #validation
-            path = os.path.join(folder_path, '*.png')
+            path = os.path.join(folder_path_img, '*.png')
             for file in glob.glob(path):
                 val_addrs.append(file)
+            path = os.path.join(folder_path_mask, '*.png')
+            for file in glob.glob(path):
+                maskval_addrs.append(file)
         else:
             #training
-            path = os.path.join(folder_path, '*.png')
+            path = os.path.join(folder_path_img, '*.png')
             for file in glob.glob(path):
                 train_addrs.append(file)
+            path = os.path.join(folder_path_mask, '*.png')
+            for file in glob.glob(path):
+                masktrain_addrs.append(file)
         
         count = count + 1
     
     train_shape = (len(train_addrs), nx, ny)
     val_shape = (len(val_addrs), nx, ny)
+    
+    if config.split_test_train:
+        if len(train_addrs) != len(masktrain_addrs) or len(val_addrs) != len(maskval_addrs):
+            raise AssertionError('Error: Masks and Images have not the same number !!!')
+    
     hdf5_file.create_dataset("images_train", train_shape, np.float32)
+    hdf5_file.create_dataset("masks_train", train_shape, np.uint8)
     if config.split_test_train:
         hdf5_file.create_dataset("images_val", val_shape, np.float32)
+        hdf5_file.create_dataset("masks_val", val_shape, np.uint8)
     
     for i in range(len(train_addrs)):
-        addr = train_addrs[i]
-        img = cv2.imread(addr,0)
+        addr_img = train_addrs[i]
+        addr_mask = masktrain_addrs[i]
+        img = cv2.imread(addr_img, 0)
+        mask = cv2.imread(addr_mask, 0)
         '''
         if config.standardize:
             img = image_utils.standardize_image(img)
@@ -106,15 +126,25 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
                                 preserve_range=True,
                                 multichannel=False,
                                 mode = 'constant')
+        mask = transform.rescale(mask,
+                                 scale_vector,
+                                 order=0,
+                                 preserve_range=True,
+                                 multichannel=False,
+                                 mode = 'constant')                    
         '''
         #img = cv2.resize(img, (nx, ny), interpolation=cv2.INTER_CUBIC)
         img = crop_or_pad_slice_to_size(img, nx, ny)
+        mask = crop_or_pad_slice_to_size(mask, nx, ny)
         hdf5_file["images_train"][i, ...] = img[None]
+        hdf5_file["masks_train"][i, ...] = mask[None]
     
     if config.split_test_train:
         for i in range(len(val_addrs)):
-            addr = val_addrs[i]
-            img = cv2.imread(addr,0)
+            addr_img = val_addrs[i]
+            addr_mask = maskval_addrs[i]
+            img = cv2.imread(addr_img, 0)
+            mask = cv2.imread(addr_mask,0)
             '''
             if config.standardize:
                 img = image_utils.standardize_image(img)
@@ -126,10 +156,18 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
                                     preserve_range=True,
                                     multichannel=False,
                                     mode = 'constant')
+            mask = transform.rescale(mask,
+                                     scale_vector,
+                                     order=0,
+                                     preserve_range=True,
+                                     multichannel=False,
+                                     mode = 'constant')
             '''
             #img = cv2.resize(img, (nx, ny), interpolation=cv2.INTER_CUBIC)
             img = crop_or_pad_slice_to_size(img, nx, ny)
-            hdf5_file["images_val"][i, ...] = img[None]   
+            mask = crop_or_pad_slice_to_size(mask, nx, ny)
+            hdf5_file["images_val"][i, ...] = img[None]
+            hdf5_file["masks_val"][i, ...] = mask[None]
 
             
     # After test train loop:
