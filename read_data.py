@@ -62,6 +62,10 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
     train_addrs = []
     val_addrs = []
     
+    # se split_test_train è True allora splitto tra train e validation i pazienti. Quando faccio il test, 
+    # split_test_train deve essere False. Split mi dive ogni quanti pazienti vanno in validation. Con 2, il 50% sono divisi. 
+    # con 5 per esempio uno ogni 5 finisc in validation etc.
+    
     if config.split_test_train:
         split = config.split
     else:
