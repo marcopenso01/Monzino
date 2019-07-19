@@ -52,7 +52,7 @@ def run_training(continue_run):
     train_on_all_data = config.train_on_all_data
     
     # Load data
-    data = acdc_data.load_and_maybe_process_data(
+    data = read_data.load_and_maybe_process_data(
         input_folder=config.data_root,
         preprocessing_folder=config.preprocessing_folder,
         mode=config.data_mode,
@@ -65,12 +65,11 @@ def run_training(continue_run):
     # the following are HDF5 datasets, not numpy arrays
     images_train = data['images_train']
     labels_train = data['masks_train']
-    id_train = data['id_images_train']
 
     if not train_on_all_data:
-        images_val = data['images_test']
-        labels_val = data['masks_test']
-        id_val = data['id_images_test']
+        images_val = data['images_val']
+        labels_val = data['masks_val']
+        
 
     if config.use_data_fraction:
         num_images = images_train.shape[0]
