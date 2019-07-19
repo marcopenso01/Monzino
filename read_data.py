@@ -125,12 +125,14 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
                                 order=1,
                                 preserve_range=True,
                                 multichannel=False,
+                                anti_aliasing=True,
                                 mode = 'constant')
         mask = transform.rescale(mask,
                                  scale_vector,
                                  order=0,
                                  preserve_range=True,
                                  multichannel=False,
+                                 anti_aliasing=True,
                                  mode = 'constant')                    
         '''
         #img = cv2.resize(img, (nx, ny), interpolation=cv2.INTER_CUBIC)
@@ -155,12 +157,14 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
                                     order=1,
                                     preserve_range=True,
                                     multichannel=False,
+                                    anti_aliasing=True,
                                     mode = 'constant')
             mask = transform.rescale(mask,
                                      scale_vector,
                                      order=0,
                                      preserve_range=True,
                                      multichannel=False,
+                                     anti_aliasing=True,
                                      mode = 'constant')
             '''
             #img = cv2.resize(img, (nx, ny), interpolation=cv2.INTER_CUBIC)
