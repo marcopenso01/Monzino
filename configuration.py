@@ -80,8 +80,12 @@ offset2 = (10,30)           #number of pixels to crop away on each side of the i
 prob = 1                    #Probability [0.0/1.0] (0 no augmentation, 1 always)
 
 # Paths settings (we need to mount MyDrive before)
-data_root = '/content/drive/My Drive/train'      
-test_data_root = '/content/drive/My Drive/ACDC_challenge/test'      
+#data_root = '/content/drive/My Drive/train'      
+#test_data_root = '/content/drive/My Drive/ACDC_challenge/test'
+img_train = '/content/drive/My Drive/prova/train'
+img_test = '/content/drive/My Drive/prova/test'
+label_train = '/content/drive/My Drive/prova/label_train'
+label_test = '/content/drive/My Drive/prova/label_test'
 preprocessing_folder = '/content/drive/My Drive/preproc_data'     
 project_root = '/content/drive/My Drive'                       
 log_root = os.path.join(project_root, 'acdc_logdir')               
