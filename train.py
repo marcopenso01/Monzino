@@ -21,7 +21,7 @@ import image_utils
 import model as model
 import acdc_data
 import configuration as config
-import augmentation2 as aug
+import augmentation as aug
 from background_generator import BackgroundGenerator
 import model_structure as model_structure
 
