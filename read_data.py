@@ -115,7 +115,7 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
         addr_mask = masktrain_addrs[i]
         img = cv2.imread(addr_img, 0)
         mask = cv2.imread(addr_mask, 0)
-        '''
+        
         if config.standardize:
             img = image_utils.standardize_image(img)
         if config.normalize:
@@ -134,7 +134,7 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
                                  multichannel=False,
                                  anti_aliasing=True,
                                  mode = 'constant')                    
-        '''
+        
         #img = cv2.resize(img, (nx, ny), interpolation=cv2.INTER_CUBIC)
         img = crop_or_pad_slice_to_size(img, nx, ny)
         mask = crop_or_pad_slice_to_size(mask, nx, ny)
@@ -147,7 +147,7 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
             addr_mask = maskval_addrs[i]
             img = cv2.imread(addr_img, 0)
             mask = cv2.imread(addr_mask,0)
-            '''
+            
             if config.standardize:
                 img = image_utils.standardize_image(img)
             if config.normalize:
@@ -166,7 +166,7 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
                                      multichannel=False,
                                      anti_aliasing=True,
                                      mode = 'constant')
-            '''
+            
             #img = cv2.resize(img, (nx, ny), interpolation=cv2.INTER_CUBIC)
             img = crop_or_pad_slice_to_size(img, nx, ny)
             mask = crop_or_pad_slice_to_size(mask, nx, ny)
