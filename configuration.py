@@ -31,8 +31,9 @@ target_resolution = (1, 1)
 pixel_size = (1,1) 
 nlabels = 4
 split_test_train = True   #divide patients in train and test. If true define split
-split = 2                 #  2: 50%,    5: 80% training, 20% test
+split = 2                 #  2: 50% train and 50% validation,    5: 80% training, 20% validation
 train_on_all_data = False 
+gt_exists = True    #True if it exists the ground_true images, otherwise False
 
 # Training settings
 batch_size = 4      #4   #5   #8
@@ -79,12 +80,13 @@ offset2 = (10,30)           #number of pixels to crop away on each side of the i
   
 prob = 1                    #Probability [0.0/1.0] (0 no augmentation, 1 always)
 
-# Paths settings (we need to mount MyDrive before)
+# Paths settings (need to mount MyDrive before)
 data_root = '/content/drive/My Drive/prova/train'      
 test_data_root = '/content/drive/My Drive/ACDC_challenge/test'
 preprocessing_folder = '/content/drive/My Drive/preproc_data'     
 project_root = '/content/drive/My Drive'                       
-log_root = os.path.join(project_root, 'acdc_logdir')               
+log_root = os.path.join(project_root, 'acdc_logdir')
+weights_root = os.path.join(log_root, experiment_name)
 
 # Pre-process settings
 standardize = False
