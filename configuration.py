@@ -33,7 +33,7 @@ nlabels = 4
 split_test_train = True   #divide patients in train and test. If true define split
 split = 2                 #  2: 50% train and 50% validation,    5: 80% training, 20% validation
 train_on_all_data = False 
-gt_exists = True    #True if it exists the ground_true images, otherwise False
+gt_exists = True    #True if it exists the ground_trth images, otherwise False.
 
 # Training settings
 batch_size = 4      #4   #5   #8
