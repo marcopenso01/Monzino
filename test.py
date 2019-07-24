@@ -21,7 +21,7 @@ import image_utils
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 
-def score_data(input_folder, output_folder, model_path, config, do_postprocessing=False, gt_exists=True, evaluate_all=False, use_iter=None):
+def score_data(input_folder, output_folder, model_path, config, do_postprocessing=False, gt_exists=True):
 
     nx, ny = config.image_size[:2]
     batch_size = 1
@@ -283,55 +283,22 @@ def score_data(input_folder, output_folder, model_path, config, do_postprocessin
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(
-        description="Script to evaluate a neural network model on the ACDC challenge data")
-    parser.add_argument("EXP_PATH", type=str, help="Path to experiment folder (assuming you are in the working directory)")
-    parser.add_argument('-t', '--evaluate_test_set', action='store_true')
-    parser.add_argument('-a', '--evaluate_all', action='store_true')
-    parser.add_argument('-i', '--iter', type=int, help='which iteration to use')
-    args = parser.parse_args()
-
-    evaluate_test_set = args.evaluate_test_set
-    evaluate_all = args.evaluate_all
-
-    if evaluate_test_set and evaluate_all:
-        raise ValueError('evaluate_all and evaluate_test_set cannot be chosen together!')
-
-    use_iter = args.iter
-    if use_iter:
-        logging.info('Using iteration: %d' % use_iter)
-
     base_path = config.project_root
     logging.info(base_path)
-    model_path = os.path.join(base_path, args.EXP_PATH)
+    model_path = config.weights_root
     logging.info(model_path)
 
-    if evaluate_test_set:
-        logging.warning('EVALUATING ON TEST SET') #not use it
-        input_path = config.test_data_root
-        output_path = os.path.join(model_path, 'predictions_testset')
-    elif evaluate_all:
-        logging.warning('EVALUATING ON ALL TRAINING DATA')
-        input_path = config.data_root
-        output_path = os.path.join(model_path, 'predictions_alltrain')
-    else:
-        logging.warning('EVALUATING ON TEST SET')
-        input_path = config.data_root
-        output_path = os.path.join(model_path, 'predictions')
-
+    logging.warning('EVALUATING ON TEST SET')
+    input_path = config.test_data_root
+    output_path = os.path.join(model_path, 'predictions')
 
     path_pred = os.path.join(output_path, 'prediction')
-    path_image = os.path.join(output_path, 'image')
     utils.makefolder(path_pred)
-    utils.makefolder(path_image)
-
-    if not evaluate_test_set:
-        path_gt = os.path.join(output_path, 'ground_truth')
-        path_diff = os.path.join(output_path, 'difference')
-        path_eval = os.path.join(output_path, 'eval')
-
-        utils.makefolder(path_diff)
-        utils.makefolder(path_gt)
+    path_eval = os.path.join(output_path, 'eval')
+    if not os.path.exists(path_eval):
+        os.makedirs(eval_dir)
+        
+    gt_exists = config.gt_exists      #True if it exists the ground_truth images, otherwise set False.
 
 
     init_iteration = score_data(input_path,
@@ -339,10 +306,8 @@ if __name__ == '__main__':
                                 model_path,
                                 config=config,
                                 do_postprocessing=True,
-                                gt_exists=(not evaluate_test_set),
-                                evaluate_all=evaluate_all,
-                                use_iter=use_iter)
+                                gt_exists)
 
 
-    if not evaluate_test_set:
+    if gt_exists:
         metrics.main(path_gt, path_pred, path_eval)
