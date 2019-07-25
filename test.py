@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import configuration as config
 import model as model
 import utils
-import acdc_data
+import read_data
 import image_utils
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
@@ -31,12 +31,9 @@ def score_data(input_folder, output_folder, model_path, config, do_postprocessin
     images_pl = tf.placeholder(tf.float32, shape=image_tensor_shape, name='images')
 
     # According to the experiment config, pick a model and predict the output
-    # TODO: Implement majority voting using 3 models.
     mask_pl, softmax_pl = model.predict(images_pl, config)
     saver = tf.train.Saver()
     init = tf.global_variables_initializer()
-
-    evaluate_test_set = not gt_exists
 
     with tf.Session() as sess:
 
@@ -295,11 +292,10 @@ if __name__ == '__main__':
     path_pred = os.path.join(output_path, 'prediction')
     utils.makefolder(path_pred)
     path_eval = os.path.join(output_path, 'eval')
-    if not os.path.exists(path_eval):
-        os.makedirs(eval_dir)
         
     gt_exists = config.gt_exists      #True if it exists the ground_truth images, otherwise set False.
-
+                                      #if True it will be defined evalutation (eval)
+   
 
     init_iteration = score_data(input_path,
                                 output_path,
@@ -310,4 +306,5 @@ if __name__ == '__main__':
 
 
     if gt_exists:
+        path_gt = os.path.join(config.test_data_root , 'mask')
         metrics.main(path_gt, path_pred, path_eval)
