@@ -46,80 +46,70 @@ def score_data(input_folder, output_folder, model_path, config, do_postprocessin
 
         total_time = 0
         total_volumes = 0
+        scale_vector = [config.pixel_size[0] / target_resolution[0], config.pixel_size[1] / target_resolution[1]]
 
-        for folder in os.listdir(input_folder):
-
-            folder_path = os.path.join(input_folder, folder)
-
+        path_img = os.path.join(input_folder, 'img')
+        if gt_exists:
+            path_mask = os.path.join(input_folder, 'mask')
+        
+        for folder in os.listdir(path_img):
+            
+            logging.info(' ----- Doing image: -------------------------')
+            logging.info('Doing: %s' % folder)
+            logging.info(' --------------------------------------------')
+            folder_path = os.path.join(path_img, folder)   #ciclo su cartelle paz
+            
+            utils.makefolder(os.path.join(path_pred, folder))
+            
             if os.path.isdir(folder_path):
-
-                if evaluate_test_set or evaluate_all:
-                    train_test = 'test'  # always test
-                else:
-                    train_test = 'test' if (int(folder[-3:]) % 5 == 0) else 'train'
-
-
-                if train_test == 'test':
-
-                    infos = {}
-                    for line in open(os.path.join(folder_path, 'Info.cfg')):
-                        label, value = line.split(':')
-                        infos[label] = value.rstrip('\n').lstrip(' ')
-
-                    patient_id = folder.lstrip('patient')
-                    ED_frame = int(infos['ED'])
-                    ES_frame = int(infos['ES'])
-
-                    for file in glob.glob(os.path.join(folder_path, 'patient???_frame??.nii.gz')):
-
-                        logging.info(' ----- Doing image: -------------------------')
-                        logging.info('Doing: %s' % file)
-                        logging.info(' --------------------------------------------')
-
-                        file_base = file.split('.nii.gz')[0]
-
-                        frame = int(file_base.split('frame')[-1])
-                        img_dat = utils.load_nii(file)
-                        img = img_dat[0].copy()
-                        #img = cv2.normalize(img, dst=None, alpha=config.min, beta=config.max, norm_type=cv2.NORM_MINMAX)
-                        #img = image_utils.normalize_image(img)
-                        print('img')
-                        print(img.shape)
-                        print(img.dtype)
-
-                        if gt_exists:
-                            file_mask = file_base + '_gt.nii.gz'
-                            mask_dat = utils.load_nii(file_mask)
-                            mask = mask_dat[0]
-
-                        start_time = time.time()
-
-                        if config.data_mode == '2D':
-
-                            pixel_size = (img_dat[2].structarr['pixdim'][1], img_dat[2].structarr['pixdim'][2])
-                            scale_vector = (pixel_size[0] / config.target_resolution[0],
-                                            pixel_size[1] / config.target_resolution[1])
-                            print('pixel_size', pixel_size)
-                            print('scale_vector', scale_vector)
-
-                            predictions = []
-                            mask_arr = []
-                            img_arr = []
-
-                            for zz in range(img.shape[2]):
-
-                                slice_img = np.squeeze(img[:,:,zz])
-                                slice_rescaled = transform.rescale(slice_img,
-                                                                   scale_vector,
-                                                                   order=1,
-                                                                   preserve_range=True,
-                                                                   multichannel=False,
-                                                                   anti_aliasing=True,
-                                                                   mode='constant')
-                                print('slice_img', slice_img.shape)
-                                print('slice_rescaled', slice_rescaled.shape)
+                
+                for phase in os.listdir(folder_path):    #ciclo su cartelle ED ES
+                    
+                    save_path = os.path.join(path_pred, folder, phase)
+                    utils.makefolder(save_path)
+                    
+                    predictions = []
+                    mask_arr = []
+                    img_arr = []
+                    masks = []
+                    imgs = []
+                    path = os.path.join(folder_path, phase)
+                    for file in os.listdir(path):
+                        img = plt.imread(os.path.join(path,file))
+                        if config.standardize:
+                            img = image_utils.standardize_image(img)
+                        if config.normalize:
+                            img = cv2.normalize(img, dst=None, alpha=config.min, beta=config.max, norm_type=cv2.NORM_MINMAX)
+                        img_arr.append(img)
+                    if  gt_exists:
+                        for file in os.listdir(os.path.join(path_mask,folder,phase)):
+                            mask_arr.append(plt.imread(os.path.join(path_mask,folder,phase,file)))
+                    
+                    img_arr = np.transpose(np.asarray(img_arr),(1,2,0))      # x,y,N
+                    if  gt_exists:
+                        mask_arr = np.transpose(np.asarray(mask_arr),(1,2,0))
+                    
+                    start_time = time.time()
+                    
+                    if config.data_mode == '2D':
+                        
+                        for zz in range(img_arr.shape[2]):
+                            
+                            slice_img = np.squeeze(img_arr[:,:,zz])
+                            slice_rescaled = transform.rescale(slice_img,
+                                                               scale_vector,
+                                                               order=1,
+                                                               preserve_range=True,
+                                                               multichannel=False,
+                                                               anti_aliasing=True,
+                                                               mode='constant')
                                 
-                                slice_mask = np.squeeze(mask[:, :, zz])
+                            slice_mask = np.squeeze(mask_arr[:, :, zz])
+                            slice_cropped = read_data.crop_or_pad_slice_to_size(slice_rescaled, nx, ny)
+                            slice_cropped = np.float32(slice_cropped)
+                            x = image_utils.reshape_2Dimage_to_tensor(slice_cropped)
+                            imgs.append(np.squeeze(x))
+                            if gt_exists:
                                 mask_rescaled = transform.rescale(slice_mask,
                                                                   scale_vector,
                                                                   order=0,
@@ -128,149 +118,129 @@ def score_data(input_folder, output_folder, model_path, config, do_postprocessin
                                                                   anti_aliasing=True,
                                                                   mode='constant')
 
-                                slice_cropped = acdc_data.crop_or_pad_slice_to_size(slice_rescaled, nx, ny)
-                                print('slice_cropped', slice_cropped.shape)
-                                mask_cropped = acdc_data.crop_or_pad_slice_to_size(mask_rescaled, nx, ny)
-                                
-                                slice_cropped = np.float32(slice_cropped)
+                                mask_cropped = read_data.crop_or_pad_slice_to_size(mask_rescaled, nx, ny)
                                 mask_cropped = np.asarray(mask_cropped, dtype=np.uint8)
-                                
-                                x = image_utils.reshape_2Dimage_to_tensor(slice_cropped)
                                 y = image_utils.reshape_2Dimage_to_tensor(mask_cropped)
+                                masks.append(np.squeeze(y))
                                 
-                                # GET PREDICTION
-                                feed_dict = {
-                                images_pl: x,
-                                }
+                            # GET PREDICTION
+                            feed_dict = {
+                            images_pl: x,
+                            }
                                 
-                                mask_out, logits_out = sess.run([mask_pl, softmax_pl], feed_dict=feed_dict)
+                            mask_out, logits_out = sess.run([mask_pl, softmax_pl], feed_dict=feed_dict)
+                            
+                            prediction_cropped = np.squeeze(logits_out[0,...])
+
+                            # ASSEMBLE BACK THE SLICES
+                            slice_predictions = np.zeros((nx,ny,num_channels))
+                            slice_predictions = prediction_cropped
+                            # RESCALING ON THE LOGITS
+                            if gt_exists:
+                                prediction = transform.resize(slice_predictions,
+                                                              (nx, ny, num_channels),
+                                                              order=1,
+                                                              preserve_range=True,
+                                                              anti_aliasing=True,
+                                                              mode='constant')
+                            else:
+                                prediction = transform.rescale(slice_predictions,
+                                                               (1.0/scale_vector[0], 1.0/scale_vector[1], 1),
+                                                               order=1,
+                                                               preserve_range=True,
+                                                               multichannel=False,
+                                                               anti_aliasing=True,
+                                                               mode='constant')
+
+                            prediction = np.uint8(np.argmax(prediction, axis=-1))
+                            
+                            predictions.append(prediction)
+                            
+       
+                        predictions = np.transpose(np.asarray(predictions, dtype=np.uint8), (1,2,0))
+                        masks = np.transpose(np.asarray(masks, dtype=np.uint8), (1,2,0))
+                        imgs = np.transpose(np.asarray(imgs, dtype=np.float32), (1,2,0))                   
 
                             
-                                prediction_cropped = np.squeeze(logits_out[0,...])
+                    # This is the same for 2D and 3D
+                    if do_postprocessing:
+                        predictions = image_utils.keep_largest_connected_components(predictions)
 
-                                # ASSEMBLE BACK THE SLICES
-                                slice_predictions = np.zeros((nx,ny,num_channels))
-                                slice_predictions = prediction_cropped
-                                # RESCALING ON THE LOGITS
-                                if gt_exists:
-                                    prediction = transform.resize(slice_predictions,
-                                                                  (nx, ny, num_channels),
-                                                                  order=1,
-                                                                  preserve_range=True,
-                                                                  anti_aliasing=True,
-                                                                  mode='constant')
-                                
+                    elapsed_time = time.time() - start_time
+                    total_time += elapsed_time
+                    total_volumes += 1
 
-                                # prediction = transform.resize(slice_predictions,
-                                #                               (mask.shape[0], mask.shape[1], num_channels),
-                                #                               order=1,
-                                #                               preserve_range=True,
-                                #                               mode='constant')
+                    logging.info('Evaluation of volume took %f secs.' % elapsed_time)
 
-                                prediction = np.uint8(np.argmax(prediction, axis=-1))
-                                predictions.append(prediction)
-                                mask_arr.append(np.squeeze(y))
-                                img_arr.append(np.squeeze(x))
-                                
-                            prediction_arr = np.transpose(np.asarray(predictions, dtype=np.uint8), (1,2,0))
-                            mask_arrs = np.transpose(np.asarray(mask_arr, dtype=np.uint8), (1,2,0))
-                            img_arrs = np.transpose(np.asarray(img_arr, dtype=np.float32), (1,2,0))                   
+                    
+                    # Save predicted mask
+                    for ii in range(predictions.shape[2]):
+                        image_file_name = os.path.join('paz', str(ii).zfill(3) + '.png')
+                        cv2.imwrite(os.path.join(save_path , image_file_name), np.squeeze(predictions[:,:,ii]))
+                    
+                    
+                    ####################################
+                    
+                    logging.info('saving to: %s' % out_file_name)
+                    utils.save_nii(out_file_name, prediction_arr, out_affine, out_header)
 
-                            
-                        # This is the same for 2D and 3D again
-                        if do_postprocessing:
-                            prediction_arr = image_utils.keep_largest_connected_components(prediction_arr)
+                    if gt_exists:
 
-                        elapsed_time = time.time() - start_time
-                        total_time += elapsed_time
-                        total_volumes += 1
+                        # Save GT image
+                        gt_file_name = os.path.join(output_folder, 'ground_truth', 'patient' + patient_id + frame_suffix + '.nii.gz')
+                        logging.info('saving to: %s' % gt_file_name)
+                        utils.save_nii(gt_file_name, mask_arrs, out_affine, out_header)
 
-                        logging.info('Evaluation of volume took %f secs.' % elapsed_time)
+                        # Save difference mask between predictions and ground truth
+                        difference_mask = np.where(np.abs(prediction_arr-mask_arrs) > 0, [1], [0])
+                        difference_mask = np.asarray(difference_mask, dtype=np.uint8)
 
-                        if frame == ED_frame:
-                            frame_suffix = '_ED'
-                        elif frame == ES_frame:
-                            frame_suffix = '_ES'
-                        else:
-                            raise ValueError('Frame doesnt correspond to ED or ES. frame = %d, ED = %d, ES = %d' %
-                                             (frame, ED_frame, ES_frame))
+               #         for zz in range(difference_mask.shape[2]):
+               #       
+               #             fig = plt.figure()
+               #             ax1 = fig.add_subplot(221)
+               #             ax1.set_axis_off()
+               #             ax1.imshow(img_arrs[:,:,zz])
+               #             ax2 = fig.add_subplot(222)
+               #             ax2.set_axis_off()
+               #             ax2.imshow(mask_arrs[:,:,zz])
+               #             ax3 = fig.add_subplot(223)
+               #             ax3.set_axis_off()
+               #             ax3.imshow(prediction_arr[:,:,zz])
+               #             ax1.title.set_text('a')
+               #             ax2.title.set_text('b')
+               #             ax3.title.set_text('c')
+               #             ax4 = fig.add_subplot(224)
+               #             ax4.set_axis_off()
+               #             ax4.imshow(difference_mask[:,:,zz], cmap=plt.cm.gnuplot)
+               #             ax1.title.set_text('a')
+               #             ax2.title.set_text('b')
+               #             ax3.title.set_text('c')
+               #             ax4.title.set_text('d')
+               #             plt.gray()
+               #             plt.show()
 
-                        # Save prediced mask
-                        out_file_name = os.path.join(output_folder, 'prediction',
-                                                     'patient' + patient_id + frame_suffix + '.nii.gz')
-                        if gt_exists:
-                            out_affine = mask_dat[1]
-                            out_header = mask_dat[2]
-                        else:
-                            out_affine = img_dat[1]
-                            out_header = img_dat[2]
 
-                        logging.info('saving to: %s' % out_file_name)
-                        utils.save_nii(out_file_name, prediction_arr, out_affine, out_header)
+                        for zz in range(difference_mask.shape[2]):
+                            plt.imshow(img_arrs[:,:,zz])
+                            plt.gray()
+                            plt.axis('off')
+                            plt.show()
+                            plt.imshow(mask_arrs[:,:,zz])
+                            plt.gray()
+                            plt.axis('off')
+                            plt.show()
+                            plt.imshow(prediction_arr[:,:,zz])
+                            plt.gray()
+                            plt.axis('off')
+                            plt.show()
+                            print('...')
 
-                        # Save image data to the same folder for convenience
-                        image_file_name = os.path.join(output_folder, 'image',
-                                                'patient' + patient_id + frame_suffix + '.nii.gz')
-                        logging.info('saving to: %s' % image_file_name)
-                        utils.save_nii(image_file_name, img_dat[0], out_affine, out_header)
-
-                        if gt_exists:
-
-                            # Save GT image
-                            gt_file_name = os.path.join(output_folder, 'ground_truth', 'patient' + patient_id + frame_suffix + '.nii.gz')
-                            logging.info('saving to: %s' % gt_file_name)
-                            utils.save_nii(gt_file_name, mask_arrs, out_affine, out_header)
-
-                            # Save difference mask between predictions and ground truth
-                            difference_mask = np.where(np.abs(prediction_arr-mask_arrs) > 0, [1], [0])
-                            difference_mask = np.asarray(difference_mask, dtype=np.uint8)
-                            
-                   #         for zz in range(difference_mask.shape[2]):
-                   #       
-                   #             fig = plt.figure()
-                   #             ax1 = fig.add_subplot(221)
-                   #             ax1.set_axis_off()
-                   #             ax1.imshow(img_arrs[:,:,zz])
-                   #             ax2 = fig.add_subplot(222)
-                   #             ax2.set_axis_off()
-                   #             ax2.imshow(mask_arrs[:,:,zz])
-                   #             ax3 = fig.add_subplot(223)
-                   #             ax3.set_axis_off()
-                   #             ax3.imshow(prediction_arr[:,:,zz])
-                   #             ax1.title.set_text('a')
-                   #             ax2.title.set_text('b')
-                   #             ax3.title.set_text('c')
-                   #             ax4 = fig.add_subplot(224)
-                   #             ax4.set_axis_off()
-                   #             ax4.imshow(difference_mask[:,:,zz], cmap=plt.cm.gnuplot)
-                   #             ax1.title.set_text('a')
-                   #             ax2.title.set_text('b')
-                   #             ax3.title.set_text('c')
-                   #             ax4.title.set_text('d')
-                   #             plt.gray()
-                   #             plt.show()
-                            
-                        
-                            for zz in range(difference_mask.shape[2]):
-                                plt.imshow(img_arrs[:,:,zz])
-                                plt.gray()
-                                plt.axis('off')
-                                plt.show()
-                                plt.imshow(mask_arrs[:,:,zz])
-                                plt.gray()
-                                plt.axis('off')
-                                plt.show()
-                                plt.imshow(prediction_arr[:,:,zz])
-                                plt.gray()
-                                plt.axis('off')
-                                plt.show()
-                                print('...')
-
-                            diff_file_name = os.path.join(output_folder,
-                                                          'difference',
-                                                          'patient' + patient_id + frame_suffix + '.nii.gz')
-                            logging.info('saving to: %s' % diff_file_name)
-                            utils.save_nii(diff_file_name, difference_mask, out_affine, out_header)
+                        diff_file_name = os.path.join(output_folder,
+                                                      'difference',
+                                                      'patient' + patient_id + frame_suffix + '.nii.gz')
+                        logging.info('saving to: %s' % diff_file_name)
+                        utils.save_nii(diff_file_name, difference_mask, out_affine, out_header)
 
 
         logging.info('Average time per volume: %f' % (total_time/total_volumes))
@@ -306,5 +276,6 @@ if __name__ == '__main__':
 
 
     if gt_exists:
+        logging.info('Evaluation of the test images')
         path_gt = os.path.join(config.test_data_root , 'mask')
         metrics.main(path_gt, path_pred, path_eval)
