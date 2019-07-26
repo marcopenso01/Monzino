@@ -177,50 +177,11 @@ def score_data(input_folder, output_folder, model_path, config, do_postprocessin
                     for ii in range(predictions.shape[2]):
                         image_file_name = os.path.join('paz', str(ii).zfill(3) + '.png')
                         cv2.imwrite(os.path.join(save_path , image_file_name), np.squeeze(predictions[:,:,ii]))
-                    
-                    
-                    ####################################
-                    
-                    logging.info('saving to: %s' % out_file_name)
-                    utils.save_nii(out_file_name, prediction_arr, out_affine, out_header)
-
+                                        
                     if gt_exists:
 
-                        # Save GT image
-                        gt_file_name = os.path.join(output_folder, 'ground_truth', 'patient' + patient_id + frame_suffix + '.nii.gz')
-                        logging.info('saving to: %s' % gt_file_name)
-                        utils.save_nii(gt_file_name, mask_arrs, out_affine, out_header)
-
-                        # Save difference mask between predictions and ground truth
-                        difference_mask = np.where(np.abs(prediction_arr-mask_arrs) > 0, [1], [0])
-                        difference_mask = np.asarray(difference_mask, dtype=np.uint8)
-
-               #         for zz in range(difference_mask.shape[2]):
-               #       
-               #             fig = plt.figure()
-               #             ax1 = fig.add_subplot(221)
-               #             ax1.set_axis_off()
-               #             ax1.imshow(img_arrs[:,:,zz])
-               #             ax2 = fig.add_subplot(222)
-               #             ax2.set_axis_off()
-               #             ax2.imshow(mask_arrs[:,:,zz])
-               #             ax3 = fig.add_subplot(223)
-               #             ax3.set_axis_off()
-               #             ax3.imshow(prediction_arr[:,:,zz])
-               #             ax1.title.set_text('a')
-               #             ax2.title.set_text('b')
-               #             ax3.title.set_text('c')
-               #             ax4 = fig.add_subplot(224)
-               #             ax4.set_axis_off()
-               #             ax4.imshow(difference_mask[:,:,zz], cmap=plt.cm.gnuplot)
-               #             ax1.title.set_text('a')
-               #             ax2.title.set_text('b')
-               #             ax3.title.set_text('c')
-               #             ax4.title.set_text('d')
-               #             plt.gray()
-               #             plt.show()
-
-
+               
+'''
                         for zz in range(difference_mask.shape[2]):
                             plt.imshow(img_arrs[:,:,zz])
                             plt.gray()
@@ -235,13 +196,7 @@ def score_data(input_folder, output_folder, model_path, config, do_postprocessin
                             plt.axis('off')
                             plt.show()
                             print('...')
-
-                        diff_file_name = os.path.join(output_folder,
-                                                      'difference',
-                                                      'patient' + patient_id + frame_suffix + '.nii.gz')
-                        logging.info('saving to: %s' % diff_file_name)
-                        utils.save_nii(diff_file_name, difference_mask, out_affine, out_header)
-
+'''
 
         logging.info('Average time per volume: %f' % (total_time/total_volumes))
 
