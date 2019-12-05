@@ -120,24 +120,22 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
             img = image_utils.standardize_image(img)
         if config.normalize:
             img = cv2.normalize(img, dst=None, alpha=config.min, beta=config.max, norm_type=cv2.NORM_MINMAX)
-        img = transform.rescale(img,
-                                scale_vector,
+        img = transform.resize(img,
+                                (nx, ny),
                                 order=1,
                                 preserve_range=True,
-                                multichannel=False,
                                 anti_aliasing=True,
                                 mode = 'constant')
-        mask = transform.rescale(mask,
-                                 scale_vector,
+        mask = transform.resize(mask,
+                                 (nx, ny),
                                  order=0,
                                  preserve_range=True,
-                                 multichannel=False,
                                  anti_aliasing=True,
                                  mode = 'constant')                    
         
         #img = cv2.resize(img, (nx, ny), interpolation=cv2.INTER_CUBIC)
-        img = crop_or_pad_slice_to_size(img, nx, ny)
-        mask = crop_or_pad_slice_to_size(mask, nx, ny)
+        #img = crop_or_pad_slice_to_size(img, nx, ny)
+        #mask = crop_or_pad_slice_to_size(mask, nx, ny)
         hdf5_file["images_train"][i, ...] = img[None]
         hdf5_file["masks_train"][i, ...] = mask[None]
     
@@ -152,24 +150,22 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
                 img = image_utils.standardize_image(img)
             if config.normalize:
                 img = cv2.normalize(img, dst=None, alpha=config.min, beta=config.max, norm_type=cv2.NORM_MINMAX)
-            img = transform.rescale(img,
-                                    scale_vector,
+            img = transform.resize(img,
+                                    (nx, ny),
                                     order=1,
                                     preserve_range=True,
-                                    multichannel=False,
                                     anti_aliasing=True,
                                     mode = 'constant')
-            mask = transform.rescale(mask,
-                                     scale_vector,
+            mask = transform.resize(mask,
+                                     (nx, ny),
                                      order=0,
                                      preserve_range=True,
-                                     multichannel=False,
                                      anti_aliasing=True,
                                      mode = 'constant')
             
             #img = cv2.resize(img, (nx, ny), interpolation=cv2.INTER_CUBIC)
-            img = crop_or_pad_slice_to_size(img, nx, ny)
-            mask = crop_or_pad_slice_to_size(mask, nx, ny)
+            #img = crop_or_pad_slice_to_size(img, nx, ny)
+            #mask = crop_or_pad_slice_to_size(mask, nx, ny)
             hdf5_file["images_val"][i, ...] = img[None]
             hdf5_file["masks_val"][i, ...] = mask[None]
 
