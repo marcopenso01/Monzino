@@ -113,7 +113,7 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
     for i in range(len(train_addrs)):
         addr_img = train_addrs[i]
         addr_mask = masktrain_addrs[i]
-        img = cv2.imread(addr_img, 0)
+        img = cv2.imread(addr_img, 0)   # 0 for reading images in grayscale
         mask = cv2.imread(addr_mask, 0)
         
         if config.standardize:
