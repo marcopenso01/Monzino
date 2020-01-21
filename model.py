@@ -36,7 +36,7 @@ def loss(logits, labels, nlabels, loss_type, weight_decay=0.0):
 
     if loss_type == 'weighted_crossentropy':
         segmentation_loss = losses.pixel_wise_cross_entropy_loss_weighted(logits, labels,
-                                                                          class_weights=[0.1, 0.3, 0.3, 0.3])
+                                                                          class_weights=[0.076, 0.308, 0.308, 0.308])
     elif loss_type == 'crossentropy':
         segmentation_loss = losses.pixel_wise_cross_entropy_loss(logits, labels)
     elif loss_type == 'dice':
