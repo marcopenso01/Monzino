@@ -7,8 +7,9 @@ import logging
 #experiment_name = 'unet2D_valid'
 #experiment_name = 'unet2D_same'
 #experiment_name = 'unet2D_same_mod'
-experiment_name = 'unet2D_light'
+#experiment_name = 'unet2D_light'
 #experiment_name = 'Dunet2D_same_mod'
+experiment_name = 'Dunet2D_same_mod2'
 #experiment_name = 'ENet'
 
 # Model settings Unet2D
@@ -16,8 +17,9 @@ weight_init = 'he_normal'    # xavier_uniform/ xavier_normal/ he_normal /he_unif
 #model_handle = model_structure.unet2D_valid
 #model_handle = model_structure.unet2D_same
 #model_handle = model_structure.unet2D_same_mod
-model_handle = model_structure.unet2D_light
+#model_handle = model_structure.unet2D_light
 #model_handle = model_structure.Dunet2D_same_mod
+model_handle = model_structure.Dunet2D_same_mod2
 
 # Model settings Enet
 # iniz = tf.contrib.layers.xavier_initializer(uniform=True)  #xavier_uniform
@@ -28,17 +30,17 @@ skip_connections = True
 
 # Data settings
 data_mode = '2D' 
-image_size = (206, 206)   #(212,212)
+image_size = (176, 176)   #(212,212)
 target_resolution = (1, 1)
 pixel_size = (1,1) 
 nlabels = 4
 split_test_train = True   #divide patients in train and test. If true define split
-split = 2                 #  2: 50% train and 50% validation,    5: 80% training, 20% validation
+split = 5                 #  2: 50% train and 50% validation,    5: 80% training, 20% validation
 train_on_all_data = False 
 gt_exists = True    #True if it exists the ground_trth images, otherwise False.
 
 # Training settings
-batch_size = 4      #4   #5   #8
+batch_size = 5      #4   #5   #8
 learning_rate = 0.01   #unet: 0.01    enet: 0.0005
 exponential_decay = False     #True Enet
 optimizer_handle = tf.compat.v1.train.AdamOptimizer     #(beta1 = 0.9, beta2 = 0.999, epsilon=1e-08)
@@ -54,7 +56,7 @@ augment_batch = True
 
 # Augmentation settings
 do_rotation_range = True   #random rotation in range "rg" (min,max)
-rg = (0,359)     
+rg = (10,350)     
 do_rotation_90 = False      #rotation 90°
 do_rotation_180 = False     #rotation 180°
 do_rotation_270 = False     #rotation 270°
@@ -93,8 +95,6 @@ weights_root = os.path.join(log_root, experiment_name)
 # Pre-process settings
 standardize = False
 normalize = True
-min = -1
-max = 1
 
 # Rarely changed settings
 use_data_fraction = False  # Should normally be False
@@ -104,4 +104,4 @@ schedule_gradient_threshold = 0.00001  # When the gradient of the learning curve
 
 train_eval_frequency = 200
 val_eval_frequency = 150
-epoch_freq = 10     #100
+epoch_freq = 5     #100
