@@ -8,6 +8,8 @@ import h5py
 import tensorflow as tf
 import shutil
 slim = tf.contrib.slim
+import glob
+import os
 
 import SimpleITK as sitk
 from multiprocessing import pool
@@ -19,7 +21,7 @@ import cv2
 import utils
 import image_utils
 import model as model
-import acdc_data
+import read_data
 import configuration as config
 import augmentation as aug
 from background_generator import BackgroundGenerator
@@ -58,8 +60,7 @@ def run_training(continue_run):
         mode=config.data_mode,
         size=config.image_size,
         target_resolution=config.target_resolution,
-        force_overwrite=False,
-        split_test_train=config.split_test_train 
+        force_overwrite=False
     )
     
     # the following are HDF5 datasets, not numpy arrays
@@ -129,7 +130,7 @@ def run_training(continue_run):
         tf.summary.scalar('learning_rate', learning_rate_pl)
 
         # Build a Graph that computes predictions from the inference model.
-        if (config.experiment_name == 'unet2D_valid' or config.experiment_name == 'unet2D_same' or config.experiment_name == 'unet2D_same_mod' or config.experiment_name == 'unet2D_light'):
+        if (config.experiment_name == 'unet2D_valid' or config.experiment_name == 'unet2D_same' or config.experiment_name == 'unet2D_same_mod' or config.experiment_name == 'unet2D_light' or config.experiment_name == 'Dunet2D_same_mod'):
             logits = model.inference(images_pl, config, training=training_pl)
         elif config.experiment_name == 'ENet':
             with slim.arg_scope(model_structure.ENet_arg_scope(weight_decay=2e-4)):
@@ -353,12 +354,18 @@ def run_training(continue_run):
                         if val_dice > best_dice:
                             best_dice = val_dice
                             best_file = os.path.join(log_dir, 'model_best_dice.ckpt')
+                            filelist = glob.glob(os.path.join(log_dir, 'model_best_dice*'))
+                            for file in filelist:
+                                os.remove(file)
                             saver_best_dice.save(sess, best_file, global_step=step)
                             logging.info('Found new best dice on validation set! - %f -  Saving model_best_dice.ckpt' % val_dice)
 
                         if val_loss < best_val:
                             best_val = val_loss
                             best_file = os.path.join(log_dir, 'model_best_xent.ckpt')
+                            filelist = glob.glob(os.path.join(log_dir, 'model_best_xent*'))
+                            for file in filelist:
+                                os.remove(file)
                             saver_best_xent.save(sess, best_file, global_step=step)
                             logging.info('Found new best crossentropy on validation set! - %f -  Saving model_best_xent.ckpt' % val_loss)
 
