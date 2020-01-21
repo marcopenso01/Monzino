@@ -43,7 +43,7 @@ def normalize_image(image):
     make image normalize between 0 and 1
     '''
     img_o = np.float32(image.copy())
-    img_o = (img_o-img_o.min())/(img_o.max()-img_o.min())
+    img_o = 2*((img_o-img_o.min())/(img_o.max()-img_o.min()))-1
     return img_o
 
 def normalise_images(X):
