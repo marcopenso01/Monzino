@@ -6,6 +6,7 @@ import nibabel as nib
 import gc
 import h5py
 from skimage import transform
+from skimage import util
 import cv2
 from PIL import Image
 
@@ -57,7 +58,7 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
     hdf5_file = h5py.File(output_file, "w")
 
     nx, ny = size
-    scale_vector = [config.pixel_size[0] / target_resolution[0], config.pixel_size[1] / target_resolution[1]]
+    # scale_vector = [config.pixel_size[0] / target_resolution[0], config.pixel_size[1] / target_resolution[1]]
     count = 1
     train_addrs = []
     val_addrs = []
@@ -65,34 +66,34 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
     maskval_addrs = []
     
     # se split_test_train è True allora splitto tra train e validation i pazienti. Quando faccio il test, 
-    # split_test_train deve essere False. Split mi dive ogni quanti pazienti vanno in validation. Con 2, il 50% sono divisi. 
+    # split_test_train deve essere False. Split mi dice ogni quanti pazienti vanno in validation. Con 2, il 50% sono divisi.
     # con 5 per esempio uno ogni 5 finisc in validation etc.
-    
-    if config.split_test_train:
+    split_test_train = config.split_test_train
+    if split_test_train:
         split = config.split
     else:
         split = 99999
     
     path_img = os.path.join(input_folder, 'img')
     path_mask = os.path.join(input_folder, 'mask')
-    for folders_img, folders_mask in zip(os.listdir(path_img), os.listdir(path_mask)):
+    for folders_img, folders_mask in zip(sorted(os.listdir(path_img)), sorted(os.listdir(path_mask))):
         folder_path_img = os.path.join(path_img, folders_img)
         folder_path_mask = os.path.join(path_mask, folders_mask)
         if count % split == 0:
             #validation
             path = os.path.join(folder_path_img, '*.png')
-            for file in glob.glob(path):
+            for file in sorted(glob.glob(path)):
                 val_addrs.append(file)
             path = os.path.join(folder_path_mask, '*.png')
-            for file in glob.glob(path):
+            for file in sorted(glob.glob(path)):
                 maskval_addrs.append(file)
         else:
             #training
             path = os.path.join(folder_path_img, '*.png')
-            for file in glob.glob(path):
+            for file in sorted(glob.glob(path)):
                 train_addrs.append(file)
             path = os.path.join(folder_path_mask, '*.png')
-            for file in glob.glob(path):
+            for file in sorted(glob.glob(path)):
                 masktrain_addrs.append(file)
         
         count = count + 1
@@ -113,27 +114,16 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
     for i in range(len(train_addrs)):
         addr_img = train_addrs[i]
         addr_mask = masktrain_addrs[i]
-        img = cv2.imread(addr_img, 0)   # 0 for reading images in grayscale
+        img = cv2.imread(addr_img, 0)   #0 for grayscale
         mask = cv2.imread(addr_mask, 0)
         
         if config.standardize:
             img = image_utils.standardize_image(img)
         if config.normalize:
-            img = cv2.normalize(img, dst=None, alpha=config.min, beta=config.max, norm_type=cv2.NORM_MINMAX)
-        img = transform.resize(img,
-                                (nx, ny),
-                                order=1,
-                                preserve_range=True,
-                                anti_aliasing=True,
-                                mode = 'constant')
-        mask = transform.resize(mask,
-                                 (nx, ny),
-                                 order=0,
-                                 preserve_range=True,
-                                 anti_aliasing=True,
-                                 mode = 'constant')                    
-        
-        #img = cv2.resize(img, (nx, ny), interpolation=cv2.INTER_CUBIC)
+            img = image_utils.normalize_image(img)
+        img = cv2.resize(img, (nx, ny), interpolation=cv2.INTER_AREA)
+        mask = cv2.resize(mask, (nx, ny), interpolation=cv2.INTER_NEAREST)
+
         #img = crop_or_pad_slice_to_size(img, nx, ny)
         #mask = crop_or_pad_slice_to_size(mask, nx, ny)
         hdf5_file["images_train"][i, ...] = img[None]
@@ -149,21 +139,10 @@ def prepare_data(input_folder, output_file, mode, size, target_resolution):
             if config.standardize:
                 img = image_utils.standardize_image(img)
             if config.normalize:
-                img = cv2.normalize(img, dst=None, alpha=config.min, beta=config.max, norm_type=cv2.NORM_MINMAX)
-            img = transform.resize(img,
-                                    (nx, ny),
-                                    order=1,
-                                    preserve_range=True,
-                                    anti_aliasing=True,
-                                    mode = 'constant')
-            mask = transform.resize(mask,
-                                     (nx, ny),
-                                     order=0,
-                                     preserve_range=True,
-                                     anti_aliasing=True,
-                                     mode = 'constant')
+                img = image_utils.normalize_image(img)
+            img = cv2.resize(img, (nx, ny), interpolation=cv2.INTER_AREA)
+            mask = cv2.resize(mask, (nx, ny), interpolation=cv2.INTER_NEAREST)
             
-            #img = cv2.resize(img, (nx, ny), interpolation=cv2.INTER_CUBIC)
             #img = crop_or_pad_slice_to_size(img, nx, ny)
             #mask = crop_or_pad_slice_to_size(mask, nx, ny)
             hdf5_file["images_val"][i, ...] = img[None]
@@ -181,7 +160,6 @@ def load_and_maybe_process_data(input_folder,
                                 target_resolution,
                                 force_overwrite=True):
 
-    
     size_str = '_'.join([str(i) for i in size])
     res_str = '_'.join([str(i) for i in target_resolution])
 
