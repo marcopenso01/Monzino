@@ -144,6 +144,9 @@ if __name__ == '__main__':
     utils.makefolder(path_pred)
     path_image = os.path.join(output_path, 'image')
     utils.makefolder(path_image)
+    if config.gt_exists:
+        path_gt = os.path.join(output_path, 'mask')
+        utils.makefolder(path_gt)
 
     init_iteration = score_data(input_path,
                                 output_path,
@@ -153,7 +156,6 @@ if __name__ == '__main__':
                                 gt_exists= config.gt_exists)
     if config.gt_exists:
         path_eval = os.path.join(output_path, 'eval')
-        path_gt = os.path.join(output_path, 'mask')
         utils.makefolder(path_eval)
         metrics.main(path_pred, path_gt, path_eval)
         
