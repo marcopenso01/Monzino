@@ -26,8 +26,40 @@ def compute_metrics_on_directories_raw(dir_gt, dir_pred):
     :return: Pandas dataframe with all measures in a row for each prediction and each structure
     """
     
-    
+    cardiac_phase = []
+    file_names = []
+    structure_names = []
 
+    # measures per structure:
+    dices_list = []
+    hausdorff_list = []
+    vol_list = []
+    vol_err_list = []
+    vol_gt_list = []
+    
+    structures_dict = {1: 'RV', 2: 'Myo', 3: 'LV'}
+    
+    for p_gt, p_pred in zip(sorted(os.listdir(dir_gt)), sorted(os.listdir(dir_pred))):
+        if (p_gt != p_pred):
+            raise ValueError("The two patients don't have the same name"
+                             " {}, {}.".format(p_gt, p_pred))
+        dir_p_gt = os.path.join(dir_gt, p_gt)
+        dir_p_pred = os.path.join(dir_pred, p_pred)
+        
+        for phase_gt, phase_pred in zip(sorted(os.listdir(dir_p_gt)), sorted(os.listdir(dir_p_pred))):
+            if (phase_gt != phase_pred):
+                raise ValueError("The two phases don't have the same name"
+                                 " {}, {}.".format(phase_gt, phase_pred))
+            dir_ph_gt = os.path.join(dir_p_gt, phase_gt)
+            dir_ph_pred = os.path.join(dir_p_pred, phase_pred)
+            
+            for img_gt, img_pred in zip(sorted(glob.glob(dir_ph_gt)), sorted(glob.glob(dir_ph_pred))):
+                if (img_gt != img_pred):
+                    raise ValueError("The two images don't have the same name"
+                                     " {}, {}.".format(img_gt, img_pred))
+                gt_addr = os.path.join(dir_ph_gt, img_gt)
+                pred_addr = os.path.join(dir_ph_pred, img_pred)
+                
 
 def main(path_pred, path_gt, eval_dir):
     logging.info(path_gt)
