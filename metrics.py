@@ -13,6 +13,22 @@ import seaborn as sns
 
 import logging
 
+
+def compute_metrics_on_directories_raw(dir_gt, dir_pred):
+    '''
+    - Dice
+    - Hausdorff distance
+    - Average surface distance
+    - Predicted volume
+    - Volume error w.r.t. ground truth
+    :param dir_gt: Directory of the ground truth segmentation maps.
+    :param dir_pred: Directory of the predicted segmentation maps.
+    :return: Pandas dataframe with all measures in a row for each prediction and each structure
+    """
+    
+    
+
+
 def main(path_pred, path_gt, eval_dir):
     logging.info(path_gt)
     logging.info(path_pred)
