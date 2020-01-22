@@ -150,8 +150,8 @@ if __name__ == '__main__':
                                 model_path,
                                 config=config,
                                 do_postprocessing=True,
-                                gt_exists= config.test_gt)
-    if config.test_gt:
+                                gt_exists= config.gt_exists)
+    if config.gt_exists:
         path_gt = os.path.join(input_path, 'mask')
         path_eval = os.path.join(output_path, 'eval')
         utils.makefolder(path_eval)
