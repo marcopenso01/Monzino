@@ -122,7 +122,7 @@ def compute_metrics_on_directories_raw(dir_gt, dir_pred):
     :param dir_gt: Directory of the ground truth segmentation maps.
     :param dir_pred: Directory of the predicted segmentation maps.
     :return: Pandas dataframe with all measures in a row for each prediction and each structure
-    """
+    '''
     
     cardiac_phase = []
     file_names = []
