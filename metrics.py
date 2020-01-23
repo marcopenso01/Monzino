@@ -88,9 +88,17 @@ def compute_metrics_on_directories_raw(dir_gt, dir_pred):
                     assd_list.append(bm.assd(pred_binary, gt_binary, voxelspacing=zooms, connectivity=1))
                     dices_list.append(bm.dc(gt_binary, pred_binary))
             
-            
+                cardiac_phase.append(phase_pred)
+                file_name.append(p_pred)
+                structure_names.append(structures_dict[struc])
 
-
+    df = pd-DataFrame({'dice': dices_list, 'hd': hausdorff_list, 'assd': assd_list,
+                       'vol': vol_list, 'vol_gt': vol_gt_list, 'vol_err': vol_err_list,
+                      'phase': cardiac_phase, 'struc': structure_names, 'filename': file_names})
+    
+    return df
+    
+    
 def main(path_pred, path_gt, eval_dir):
     logging.info(path_gt)
     logging.info(path_pred)
