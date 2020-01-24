@@ -135,7 +135,7 @@ def batch_normalisation_layer(bottom, name, training):
 #     :return: Batch normalised activation
 #     '''
 #
-#     with tf.variable_scope(name):
+#     with tf.compat.v1.variable_scope(name):
 #
 #         n_out = bottom.get_shape().as_list()[-1]
 #         tensor_dim = len(bottom.get_shape().as_list())
@@ -199,7 +199,7 @@ def conv2D_layer(bottom,
 
     strides_augm = [1, strides[0], strides[1], 1]
 
-    with tf.variable_scope(name):
+    with tf.compat.v1.variable_scope(name):
         #initialise weights
         weights = get_weight_variable(weight_shape, name='W', type=weight_init, regularize=True)
         op = tf.nn.conv2d(bottom, filter=weights, strides=strides_augm, padding=padding)
@@ -269,7 +269,7 @@ def conv3D_layer(bottom,
 
     strides_augm = [1, strides[0], strides[1], strides[2], 1]
 
-    with tf.variable_scope(name):
+    with tf.compat.v1.variable_scope(name):
 
         weights = get_weight_variable(weight_shape, name='W', type=weight_init, regularize=True)
         op = tf.nn.conv3d(bottom, filter=weights, strides=strides_augm, padding=padding)
@@ -312,7 +312,7 @@ def deconv2D_layer(bottom,
     bias_shape = [num_filters]
     strides_augm = [1, strides[0], strides[1], 1]
 
-    with tf.variable_scope(name):
+    with tf.compat.v1.variable_scope(name):
 
         weights = get_weight_variable(weight_shape, name='W', type=weight_init, regularize=True)
 
@@ -363,7 +363,7 @@ def deconv3D_layer(bottom,
 
     strides_augm = [1, strides[0], strides[1], strides[2], 1]
 
-    with tf.variable_scope(name):
+    with tf.compat.v1.variable_scope(name):
 
         weights = get_weight_variable(weight_shape, name='W', type=weight_init, regularize=True)
 
@@ -406,7 +406,7 @@ def conv2D_dilated_layer(bottom,
     weight_shape = [kernel_size[0], kernel_size[1], bottom_num_filters, num_filters]
     bias_shape = [num_filters]
 
-    with tf.variable_scope(name):
+    with tf.compat.v1.variable_scope(name):
 
         weights = get_weight_variable(weight_shape, name='W', type=weight_init, regularize=True)
 
@@ -441,7 +441,7 @@ def dense_layer(bottom,
     weight_shape = [bottom_rhs_dim, hidden_units]
     bias_shape = [hidden_units]
 
-    with tf.variable_scope(name):
+    with tf.compat.v1.variable_scope(name):
 
         weights = get_weight_variable(weight_shape, name='W', type=weight_init, regularize=True)
 
