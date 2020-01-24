@@ -678,7 +678,7 @@ def get_weight_variable(shape, name=None, type='xavier_uniform', regularize=True
             weight = tf.compat.v1.get_variable(name, shape=shape, initializer=initial)
 
     if regularize:
-        tf.add_to_collection('weight_variables', weight)
+        tf.compat.v1.add_to_collection('weight_variables', weight)
 
     return weight
 
@@ -730,7 +730,7 @@ def _bilinear_upsample_weights(shape):
 def _add_summaries(op, weights, biases):
 
     # Tensorboard variables
-    tf.summary.histogram(weights.name, weights)
+    tf.compat.v1.summary.histogram(weights.name, weights)
     if biases:
-        tf.summary.histogram(biases.name, biases)
-    tf.summary.histogram(op.op.name + '/activations', op)
+        tf.compat.v1.summary.histogram(biases.name, biases)
+    tf.compat.v1.summary.histogram(op.op.name + '/activations', op)
