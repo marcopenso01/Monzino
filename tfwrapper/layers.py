@@ -155,9 +155,9 @@ def batch_normalisation_layer(bottom, name, training):
 #
 #         init_beta = tf.constant(0.0, shape=[n_out], dtype=tf.float32)
 #         init_gamma = tf.constant(1.0, shape=[n_out], dtype=tf.float32)
-#         beta = tf.get_variable(name='beta', dtype=tf.float32, initializer=init_beta, regularizer=None,
+#         beta = tf.compat.v1.get_variable(name='beta', dtype=tf.float32, initializer=init_beta, regularizer=None,
 #                                trainable=True)
-#         gamma = tf.get_variable(name='gamma', dtype=tf.float32, initializer=init_gamma, regularizer=None,
+#         gamma = tf.compat.v1.get_variable(name='gamma', dtype=tf.float32, initializer=init_gamma, regularizer=None,
 #                                 trainable=True)
 #
 #         batch_mean, batch_var = tf.nn.moments(bottom, moments_over_axes, name='moments')
@@ -673,9 +673,9 @@ def get_weight_variable(shape, name=None, type='xavier_uniform', regularize=True
         weight = tf.Variable(initial)
     else:
         if initialise_from_constant:
-            weight = tf.get_variable(name, initializer=initial)
+            weight = tf.compat.v1.get_variable(name, initializer=initial)
         else:
-            weight = tf.get_variable(name, shape=shape, initializer=initial)
+            weight = tf.compat.v1.get_variable(name, shape=shape, initializer=initial)
 
     if regularize:
         tf.add_to_collection('weight_variables', weight)
@@ -689,7 +689,7 @@ def get_bias_variable(shape, name=None, init_value=0.0):
     if name is None:
         return tf.Variable(initial)
     else:
-        return tf.get_variable(name, initializer=initial)
+        return tf.compat.v1.get_variable(name, initializer=initial)
 
 
 
