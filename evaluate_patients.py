@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import configuration as config
 import model as model
 import utils
-import acdc_data
+import read_data
 import image_utils
 
 def score_data(input_folder, output_folder, model_path, config, do_postprocessing=False, gt_exists=True):
