@@ -285,7 +285,7 @@ def main(path_pred, path_gt, eval_dir):
     logging.info(path_pred)
     logging.info(eval_dir)
     
-    if os.path.isdir(path_gr) and os.path.isdir(path_pred):
+    if os.path.isdir(path_gt) and os.path.isdir(path_pred):
         
         df = compute_metrics_on_directories_raw(path_gt, path_pred)
         
