@@ -184,11 +184,11 @@ def compute_metrics_on_directories_raw(dir_gt, dir_pred):
                     dices_list.append(0)
                     hausdorff_list.append(1)
                 else:
-                    hausdorff_list.append(bm.hd(gt_binary, pred_binary, voxelspacing=zooms, connectivity=1))
+                    hausdorff_list.append(bm.hd(gt_binary, pred_binary, connectivity=1))
                     dices_list.append(bm.dc(gt_binary, pred_binary))
             
                 cardiac_phase.append(phase_pred)
-                file_name.append(p_pred)
+                file_names.append(p_pred)
                 structure_names.append(structures_dict[struc])
 
     df = pd.DataFrame({'dice': dices_list, 'hd': hausdorff_list,
