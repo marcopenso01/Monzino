@@ -163,8 +163,8 @@ def compute_metrics_on_directories_raw(dir_gt, dir_pred):
                     gt = cv2.imread(img_gt,0)
                     pred = cv2.imread(img_pred,0)
                     if (gt.shape != pred.shape):
-                    raise ValueError("The two images don't have the same shape"
-                                      " {}, {}.".format(gt.shape, pred.shape))
+                        raise ValueError("The two images don't have the same shape"
+                                         " {}, {}.".format(gt.shape, pred.shape))
 
                     gt_binary = (gt == struc) * 1
                     pred_binary = (pred == struc) * 1
