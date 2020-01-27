@@ -48,11 +48,11 @@ def score_data(input_folder, output_folder, model_path, config, do_postprocessin
                     
                     if gt_exists:
                         mask_path = os.path.join(phase_path, 'mask')
-                        mask_arr = []
 
                     start_time = time.time()
                     predictions = []
                     img_arr = []
+                    mask_arr = []
 
                     for file in sorted(glob.glob(os.path.join(img_path, '*.png))):  #elenco delle img
                         
@@ -78,14 +78,14 @@ def score_data(input_folder, output_folder, model_path, config, do_postprocessin
                         predictions.append(prediction)
                         img_arr.append(img)
 
-                        if gt_exists:
-                            for filem in sorted(glob.glob(os.path.join(mask_path, '*.png'))):
-                                
-                                mask = cv2.imread(filem, 0)
-                                mask = cv2.resize(mask, (nx, ny), interpolation=cv2.INTER_NEAREST)
-                                mask = np.asarray(mask, dtype=np.uint8)
-                                y = image_utils.reshape_2Dimage_to_tensor(mask)
-                                mask_arr.append(np.squeeze(y))
+                    if gt_exists:
+                        for filem in sorted(glob.glob(os.path.join(mask_path, '*.png'))):
+
+                            mask = cv2.imread(filem, 0)
+                            mask = cv2.resize(mask, (nx, ny), interpolation=cv2.INTER_NEAREST)
+                            mask = np.asarray(mask, dtype=np.uint8)
+                            #y = image_utils.reshape_2Dimage_to_tensor(mask)
+                            mask_arr.append(mask)
 
                     prediction_arr = np.transpose(np.asarray(predictions, dtype=np.uint8), (1,2,0))
                     img_arrs = np.transpose(np.asarray(img_arr, dtype=np.float32), (1,2,0))                   
@@ -121,7 +121,7 @@ def score_data(input_folder, output_folder, model_path, config, do_postprocessin
                         utils.makefolder(mask_file_name)
                         for zz in range(mask_arrs.shape[2]):
                             slice_img = np.squeeze(mask_arrs[:,:,zz])
-                            cv2.imwrite(os.path.join(mask_file_name, 'img', str(zz) + '.png'), slice_img)
+                            cv2.imwrite(os.path.join(mask_file_name, 'img' + str(zz) + '.png'), slice_img)
 
         logging.info('Average time per volume: %f' % (total_time/total_volumes))
    
