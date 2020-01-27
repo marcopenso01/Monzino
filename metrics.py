@@ -156,13 +156,15 @@ def compute_metrics_on_directories_raw(dir_gt, dir_pred):
                 volpred = 0
                 volgt = 0
                 for img_gt, img_pred in zip(sorted(glob.glob(dir_ph_gt)), sorted(glob.glob(dir_ph_pred))):
-                    if (img_gt != img_pred):
+                    if (img_gt.split(phase_gt + '/')[1] != img_pred.split(phase_pred + '/')[1]):
                         raise ValueError("The two images don't have the same name"
                                          " {}, {}.".format(img_gt, img_pred))
-                    gt_addr = os.path.join(dir_ph_gt, img_gt)
-                    pred_addr = os.path.join(dir_ph_pred, img_pred)
-                    gt = cv2.imread(gt_addr,0)
-                    pred = cv2.imread(pred_addr,0)
+                    
+                    gt = cv2.imread(img_gt,0)
+                    pred = cv2.imread(img_pred,0)
+                    if (gt.shape != pred.shape):
+                    raise ValueError("The two images don't have the same shape"
+                                      " {}, {}.".format(gt.shape, pred.shape))
 
                     gt_binary = (gt == struc) * 1
                     pred_binary = (pred == struc) * 1
