@@ -192,7 +192,7 @@ def compute_metrics_on_directories_raw(dir_gt, dir_pred):
                 file_name.append(p_pred)
                 structure_names.append(structures_dict[struc])
 
-    df = pd.DataFrame({'dice': dices_list, 'hd': hausdorff_list, 'assd': assd_list,
+    df = pd.DataFrame({'dice': dices_list, 'hd': hausdorff_list,
                        'vol': vol_list, 'vol_gt': vol_gt_list, 'vol_err': vol_err_list,
                       'phase': cardiac_phase, 'struc': structure_names, 'filename': file_names})
     
