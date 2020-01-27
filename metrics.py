@@ -185,7 +185,6 @@ def compute_metrics_on_directories_raw(dir_gt, dir_pred):
                     hausdorff_list.append(1)
                 else:
                     hausdorff_list.append(bm.hd(gt_binary, pred_binary, voxelspacing=zooms, connectivity=1))
-                    assd_list.append(bm.assd(pred_binary, gt_binary, voxelspacing=zooms, connectivity=1))
                     dices_list.append(bm.dc(gt_binary, pred_binary))
             
                 cardiac_phase.append(phase_pred)
