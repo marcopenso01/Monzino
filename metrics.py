@@ -10,7 +10,7 @@ import utils
 import binary_metric as bm
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+import glob
 import logging
 
 def conv_int(i):
@@ -144,6 +144,8 @@ def compute_metrics_on_directories_raw(dir_gt, dir_pred):
         dir_p_gt = os.path.join(dir_gt, p_gt)
         dir_p_pred = os.path.join(dir_pred, p_pred)
         
+        print(p_gt)
+        
         for phase_gt, phase_pred in zip(sorted(os.listdir(dir_p_gt)), sorted(os.listdir(dir_p_pred))):
             if (phase_gt != phase_pred):
                 raise ValueError("The two phases don't have the same name"
@@ -151,42 +153,48 @@ def compute_metrics_on_directories_raw(dir_gt, dir_pred):
             dir_ph_gt = os.path.join(dir_p_gt, phase_gt)
             dir_ph_pred = os.path.join(dir_p_pred, phase_pred)
             
-            for struc in [3,1,2]:
-                
-                volpred = 0
-                volgt = 0
-                for img_gt, img_pred in zip(sorted(glob.glob(dir_ph_gt)), sorted(glob.glob(dir_ph_pred))):
-                    if (img_gt.split(phase_gt + '/')[1] != img_pred.split(phase_pred + '/')[1]):
-                        raise ValueError("The two images don't have the same name"
-                                         " {}, {}.".format(img_gt, img_pred))
+            pred_arr = []
+            mask_arr = []
+            for img_gt, img_pred in zip(sorted(glob.glob(os.path.join(dir_ph_gt, '*.png'))), sorted(glob.glob(os.path.join(dir_ph_pred, '*.png')))):
+                if (img_gt.split(phase_gt + '/')[1] != img_pred.split(phase_pred + '/')[1]):
+                    raise ValueError("The two images don't have the same name"
+                                     " {}, {}.".format(img_gt, img_pred))
                     
-                    gt = cv2.imread(img_gt,0)
-                    pred = cv2.imread(img_pred,0)
-                    if (gt.shape != pred.shape):
-                        raise ValueError("The two images don't have the same shape"
-                                         " {}, {}.".format(gt.shape, pred.shape))
+                gt = cv2.imread(img_gt,0)
+                pred = cv2.imread(img_pred,0)
+                if (gt.shape != pred.shape):
+                    raise ValueError("The two images don't have the same shape"
+                                     " {}, {}.".format(gt.shape, pred.shape))
+                
+                pred_arr.append(pred)
+                mask_arr.append(gt)
 
-                    gt_binary = (gt == struc) * 1
-                    pred_binary = (pred == struc) * 1
-                    
-                    volpred = volpred + (pred_binary.sum() * config.z_dim)
-                    volgt = volgt + (gt_binary.sum() * config.z_dim)
-                
+            pred_arr = np.transpose(np.asarray(pred_arr, dtype=np.uint8), (1,2,0))
+            mask_arr = np.transpose(np.asarray(mask_arr, dtype=np.uint8), (1,2,0))
+            print(pred_arr.shape)
+            
+            for struc in [3,1,2]:
+                gt_binary = (mask_arr == struc) * 1
+                pred_binary = (pred_arr == struc) * 1
+
+                volpred = pred_binary.sum() * config.z_dim / 1000.
+                volgt = gt_binary.sum() * config.z_dim / 1000.
+            
                 vol_list.append(volpred)
                 vol_err_list.append(volpred - volgt)
                 vol_gt_list.append(volgt)
                 
-                if gt_binary.sum() == 0 and pred_binary.sum() == 0:
+                if np.sum(gt_binary) == 0 and np.sum(pred_binary) == 0:
                     dices_list.append(1)
                     hausdorff_list.append(0)
-                elif pred_binary.sum() > 0 and gt_binary.sum() == 0 or pred_binary.sum() == 0 and gt_binary.sum() > 0:
-                    logging.warning('Structure missing in either GT (x)or prediction. ASSD and HD will not be accurate.')
+                elif np.sum(pred_binary) > 0 and np.sum(gt_binary) == 0 or np.sum(pred_binary) == 0 and np.sum(gt_binary) > 0:
+                    logging.warning('Structure missing in either GT (x)or prediction. HD will not be accurate.')
                     dices_list.append(0)
                     hausdorff_list.append(1)
                 else:
                     hausdorff_list.append(bm.hd(gt_binary, pred_binary, connectivity=1))
                     dices_list.append(bm.dc(gt_binary, pred_binary))
-            
+
                 cardiac_phase.append(phase_pred)
                 file_names.append(p_pred)
                 structure_names.append(structures_dict[struc])
