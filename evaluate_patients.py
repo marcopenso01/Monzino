@@ -54,7 +54,7 @@ def score_data(input_folder, output_folder, model_path, config, do_postprocessin
                     img_arr = []
                     mask_arr = []
 
-                    for file in sorted(glob.glob(os.path.join(img_path, '*.png))):  #elenco delle img
+                    for file in sorted(glob.glob(os.path.join(img_path, '*.png'))):  #elenco delle img
                         
                         img = cv2.imread(file, 0)
                         if config.standardize:
