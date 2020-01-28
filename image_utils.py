@@ -74,23 +74,20 @@ def keep_largest_connected_components(mask):
     '''
     Keeps only the largest connected components of each label for a segmentation mask.
     '''
+    for zz in range(mask.shape[2]):
+        img = mask[:,:,zz]
+        out_img = np.zeros(img.shape, dtype=np.uint8)
 
-    out_img = np.zeros(mask.shape, dtype=np.uint8)
+        for struc_id in [1, 2, 3]:
 
-    for struc_id in [1, 2, 3]:
-
-        binary_img = mask == struc_id
-        blobs = measure.label(binary_img, connectivity=1)
-
-        props = measure.regionprops(blobs)
-
-        if not props:
-            continue
-
-        area = [ele.area for ele in props]
-        largest_blob_ind = np.argmax(area)
-        largest_blob_label = props[largest_blob_ind].label
-
-        out_img[blobs == largest_blob_label] = struc_id
-
-    return out_img
+            binary_img = img == struc_id
+            blobs = measure.label(binary_img, connectivity=1)
+            props = measure.regionprops(blobs)
+            if not props:
+                continue
+            area = [ele.area for ele in props]
+            largest_blob_ind = np.argmax(area)
+            largest_blob_label = props[largest_blob_ind].label
+            out_img[blobs == largest_blob_label] = struc_id
+        mask[:,:,zz] = out_img
+    return mask
