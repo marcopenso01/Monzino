@@ -64,7 +64,7 @@ do_rotation_270 = False     #rotation 270°
 do_rotation_reshape = False #rotation of a specific 'angle' with reshape
 do_rotation = False         #rotation of a specific 'angle'
 angle = 45
-crop = True                #crops/cuts away pixels at the sides of the image
+crop = False                #crops/cuts away pixels at the sides of the image
 do_fliplr = True           #Flip array in the left/right direction
 do_flipud = True           #Flip array in the up/down direction.
 RandomContrast= False       #Random change contrast of an image
@@ -105,4 +105,4 @@ schedule_gradient_threshold = 0.00001  # When the gradient of the learning curve
 
 train_eval_frequency = 200
 val_eval_frequency = 150
-epoch_freq = 6     #100
+epoch_freq = 5     #100
