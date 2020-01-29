@@ -41,7 +41,7 @@ gt_exists = True    #True if it exists the ground_trth images, otherwise False.
 z_dim = 1
 
 # Training settings
-batch_size = 5      #4   #5   #8
+batch_size = 4      #4   #5   #8
 learning_rate = 0.01   #unet: 0.01    enet: 0.0005
 exponential_decay = False     #True Enet
 optimizer_handle = tf.compat.v1.train.AdamOptimizer     #(beta1 = 0.9, beta2 = 0.999, epsilon=1e-08)
@@ -50,7 +50,7 @@ warmup_training = True
 weight_decay = 0  # enet:2e-4    #unet: 0.00000
 momentum = None
 # loss can be 'weighted_crossentropy'/'crossentropy'/'dice'/'dice_onlyfg'/'crossentropy_and_dice (alfa,beta)'
-loss_type = 'weighted_crossentropy'
+loss_type = 'crossentropy_and_dice'
 alfa = 1     #1      
 beta = 0.2   #1      
 augment_batch = True
@@ -105,4 +105,4 @@ schedule_gradient_threshold = 0.00001  # When the gradient of the learning curve
 
 train_eval_frequency = 200
 val_eval_frequency = 150
-epoch_freq = 5     #100
+epoch_freq = 6     #100
