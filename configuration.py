@@ -57,7 +57,7 @@ augment_batch = True
 
 # Augmentation settings
 do_rotation_range = True   #random rotation in range "rg" (min,max)
-rg = (10,350)     
+rg = (-15,15)     
 do_rotation_90 = False      #rotation 90°
 do_rotation_180 = False     #rotation 180°
 do_rotation_270 = False     #rotation 270°
@@ -105,4 +105,4 @@ schedule_gradient_threshold = 0.00001  # When the gradient of the learning curve
 
 train_eval_frequency = 200
 val_eval_frequency = 150
-epoch_freq = 5     #100
+epoch_freq = 5     
