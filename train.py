@@ -470,8 +470,8 @@ def iterate_minibatches(images, labels, batch_size, augment_batch=False):
 def main():
 
     continue_run = True
-    if not tf.gfile.Exists(log_dir):
-        tf.gfile.MakeDirs(log_dir)
+    if not tf.io.gfile.exists(log_dir):
+        tf.io.gfile.makedirs(log_dir)
         continue_run = False
 
     # Copy experiment config file
