@@ -12,7 +12,7 @@ from datetime import datetime
 from shutil import copyfile
 # import imgaug as ia
 # from imgaug import augmenters as iaa
-from scipy.misc import imsave, imread
+from scipy.misc import imread
 
 from PIL import Image, ImageOps, ImageEnhance
 import math
