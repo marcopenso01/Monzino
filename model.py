@@ -44,7 +44,7 @@ def loss(logits, labels, nlabels, loss_type, weight_decay=0.0):
     elif loss_type == 'dice_onlyfg':
         segmentation_loss = losses.dice_loss(logits, labels, only_foreground=True)
     elif loss_type == 'crossentropy_and_dice':
-        segmentation_loss = config.alfa*losses.pixel_wise_cross_entropy_loss(logits, labels) + config.beta*losses.dice_loss(logits, labels)
+        segmentation_loss = config.alfa*losses.pixel_wise_cross_entropy_loss_weighted(logits, labels, class_weights=[0.076, 0.308, 0.308, 0.308]) + config.beta*losses.dice_loss(logits, labels, only_foreground=True)
     else:
         raise ValueError('Unknown loss: %s' % loss_type)
 
