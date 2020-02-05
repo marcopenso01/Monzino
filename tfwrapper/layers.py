@@ -15,7 +15,7 @@ def max_pool_layer2d(x, kernel_size=(2, 2), strides=(2, 2), padding="SAME"):
     kernel_size_aug = [1, kernel_size[0], kernel_size[1], 1]
     strides_aug = [1, strides[0], strides[1], 1]
 
-    op = tf.nn.max_pool2d(x, ksize=kernel_size_aug, strides=strides_aug, padding=padding)
+    op = tf.nn.max_pool(x, ksize=kernel_size_aug, strides=strides_aug, padding=padding)
 
     return op
 
