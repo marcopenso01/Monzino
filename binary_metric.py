@@ -20,7 +20,7 @@ from scipy.stats import pearsonr
 # true_negative_rate(result, reference) 	True negative rate.
 # positive_predictive_value(result, reference) 	Positive predictive value.
 # ravd(result, reference) 	Relative absolute volume difference.
-
+# f1(result, reference)
 
 # code
 def dc(result, reference):
@@ -2443,3 +2443,8 @@ def __combine_windows(w1, w2):
     for s1, s2 in zip(w1, w2):
         res.append(slice(min(s1.start, s2.start), max(s1.stop, s2.stop)))
     return tuple(res)
+
+def f1(result, reference):
+    rec = recall(result, reference)
+    prec = precision(result, reference)
+    return = 2 * (prec * rec) / (prec + rec)
