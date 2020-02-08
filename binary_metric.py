@@ -2445,6 +2445,13 @@ def __combine_windows(w1, w2):
     return tuple(res)
 
 def f1(result, reference):
+    '''
+    F1 score reaches its best value at 1 and worst score at 0.
+    '''
     rec = recall(result, reference)
     prec = precision(result, reference)
-    return = 2 * (prec * rec) / (prec + rec)
+    try:
+        f1 = 2. * float(prec * rec) / float(prec + rec)
+    except ZeroDivisionError:
+        f1 = 0.0
+    return = f1
