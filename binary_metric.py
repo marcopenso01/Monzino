@@ -2454,4 +2454,4 @@ def f1(result, reference):
         f1 = 2. * float(prec * rec) / float(prec + rec)
     except ZeroDivisionError:
         f1 = 0.0
-    return = f1
+    return f1
