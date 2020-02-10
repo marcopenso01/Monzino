@@ -41,7 +41,7 @@ gt_exists = True    #True if it exists the ground_trth images, otherwise False.
 z_dim = 1
 
 # Training settings
-batch_size = 4      #4   #5   #8
+batch_size = 4      #4 
 learning_rate = 0.01   #unet: 0.01    enet: 0.0005
 exponential_decay = False     #True Enet
 optimizer_handle = tf.compat.v1.train.AdamOptimizer     #(beta1 = 0.9, beta2 = 0.999, epsilon=1e-08)
@@ -65,17 +65,17 @@ do_rotation_reshape = False #rotation of a specific 'angle' with reshape
 do_rotation = False         #rotation of a specific 'angle'
 angle = 45
 crop = False                #crops/cuts away pixels at the sides of the image
-do_fliplr = True           #Flip array in the left/right direction
-do_flipud = True           #Flip array in the up/down direction.
+do_fliplr = False           #Flip array in the left/right direction
+do_flipud = False           #Flip array in the up/down direction.
 RandomContrast= False       #Random change contrast of an image
 min_factor = 1.0
 max_factor = 1.0
-blurr = False               #Blurring the image with gaussian filter with random 'sigma'
-sigma = (0.5,1.0)           #generate a random sigma in range(min,max) 
+blurr = True               #Blurring the image with gaussian filter with random 'sigma'
 SaltAndPepper = False
 density = 0.05              #Noise density for salt and pepper noise, specified as a numeric scalar.
 Multiply = False            #Multiply all pixels in an image with a specific value (m)
 m = 1
+gamma = True
 ElasticTransformation = False #Moving pixels locally around using displacement fields.
 alpha = (0.0, 70.0)         #alpha and sigma can be a number or tuple (a, b)
 sigma = 5.0                 #If tuple a random value from range ``a <= x <= b`` will be used
