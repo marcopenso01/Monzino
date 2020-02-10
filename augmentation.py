@@ -10,10 +10,10 @@ import random
 from glob import glob
 from datetime import datetime
 from shutil import copyfile
-# import imgaug as ia
-# from imgaug import augmenters as iaa
+import imgaug as ia
+from imgaug import augmenters as iaa
 from scipy.misc import imread
-
+from skimage import exposure
 from PIL import Image, ImageOps, ImageEnhance
 import math
 from math import floor, ceil
@@ -60,6 +60,8 @@ def augmentation_function(images, labels):
     do_fliplr = config.do_fliplr
     do_flipud = config.do_flipud
     crop = config.crop
+    do_gamma = config.gamma
+    do_blurr = config.blurr
     
     # Probability to perform a generic operation
     prob = config.prob
@@ -84,7 +86,7 @@ def augmentation_function(images, labels):
                     img = image_utils.rotate_image(img, random_angle)
                     lbl = image_utils.rotate_image(lbl, random_angle, interp=cv2.INTER_NEAREST)
                     
-                    
+            
             # FLIP Lelf/Right
             if do_fliplr:
                 coin_flip = np.random.randint(2)
@@ -118,6 +120,19 @@ def augmentation_function(images, labels):
                     img = zoom(img, zfactor)
                     lbl = zoom(lbl, zfactor)
             
+            # RANDOM GAMMA CORRECTION
+            if do_gamma:
+                coin_flip = np.random.randint(2)
+                if coin_flip == 0:
+                    gamma = random.randrange(7,13,1)
+                    img = exposure.adjust_gamma(img, gamma/10)
+            
+            # RANDOM BLURR
+            if do_blurr:
+                coin_flip = np.random.randint(2)
+                if coin_flip == 0:
+                    sigma = random.randrange(4,18,2)
+                    img = scipy.ndimage.gaussian_filter(img, sigma/10)
             
             new_images.append(img[..., np.newaxis])
             new_labels.append(lbl[...])
