@@ -124,7 +124,7 @@ def augmentation_function(images, labels):
             if do_gamma:
                 coin_flip = np.random.randint(2)
                 if coin_flip == 0:
-                    gamma = random.randrange(7,13,1)
+                    gamma = random.randrange(8,13,1)
                     img = exposure.adjust_gamma(img, gamma/10)
             
             # RANDOM BLURR
