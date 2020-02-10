@@ -131,7 +131,7 @@ def augmentation_function(images, labels):
             if do_blurr:
                 coin_flip = np.random.randint(2)
                 if coin_flip == 0:
-                    sigma = random.randrange(4,18,2)
+                    sigma = random.randrange(6,16,2)
                     img = scipy.ndimage.gaussian_filter(img, sigma/10)
             
             new_images.append(img[..., np.newaxis])
