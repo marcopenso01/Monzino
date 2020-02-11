@@ -567,6 +567,118 @@ def Dunet2D_same_mod2(images, training, nlabels):
     return pred
 
 
+def Dunet2D_same_mod3(images, training, nlabels):
+    conv1_1 = layers.conv2D_layer_bn(images, 'conv1_1', num_filters=48, training=training)
+    logging.info('conv1_1')
+    logging.info(conv1_1.shape)
+    conv1_2 = layers.conv2D_layer_bn(conv1_1, 'conv1_2', num_filters=48, training=training)
+    logging.info('conv1_2')
+    logging.info(conv1_2.shape)
+
+    pool1 = layers.max_pool_layer2d(conv1_2)
+    logging.info('pool1')
+    logging.info(pool1.shape)
+
+    conv2_1 = layers.conv2D_layer_bn(pool1, 'conv2_1', num_filters=96, training=training)
+    logging.info('conv2_1')
+    logging.info(conv2_1.shape)
+    conv2_2 = layers.conv2D_layer_bn(conv2_1, 'conv2_2', num_filters=96, training=training)
+    logging.info('conv2_2')
+    logging.info(conv2_2.shape)
+
+    pool2 = layers.max_pool_layer2d(conv2_2)
+    logging.info('pool2')
+    logging.info(pool2.shape)
+
+    conv3_1 = layers.conv2D_layer_bn(pool2, 'conv3_1', num_filters=192, training=training)
+    logging.info('conv3_1')
+    logging.info(conv3_1.shape)
+    conv3_2 = layers.conv2D_layer_bn(conv3_1, 'conv3_2', num_filters=192, training=training)
+    logging.info('conv3_2')
+    logging.info(conv3_2.shape)
+
+    pool3 = layers.max_pool_layer2d(conv3_2)
+    logging.info('pool3')
+    logging.info(pool3.shape)
+
+    conv4_1 = layers.conv2D_layer_bn(pool3, 'conv4_1', num_filters=384, training=training)
+    logging.info('conv4_1')
+    logging.info(conv4_1.shape)
+    conv4_2 = layers.conv2D_layer_bn(conv4_1, 'conv4_2', num_filters=384, training=training)
+    logging.info('conv4_2')
+    logging.info(conv4_2.shape)
+
+    upconv3 = layers.deconv2D_layer_bn(conv4_2, name='upconv3', kernel_size=(4, 4), strides=(2, 2), num_filters=nlabels,
+                                       training=training)
+    logging.info('upconv3')
+    logging.info(upconv3.shape)
+    skip3_1 = layers.res_net_block(conv3_2, name='skip3_1', num_filters=192, training=training)
+    logging.info('skip3_1')
+    logging.info(skip3_1.shape)
+    concat3 = tf.concat([skip3_1, upconv3], axis=3, name='concat3')
+    logging.info('concat3')
+    logging.info(concat3.shape)
+
+    conv7_1 = layers.conv2D_layer_bn(concat3, 'conv7_1', num_filters=192, training=training)
+    logging.info('conv7_1')
+    logging.info(conv7_1.shape)
+    conv7_2 = layers.conv2D_layer_bn(conv7_1, 'conv7_2', num_filters=192, training=training)
+    logging.info('conv7_2')
+    logging.info(conv7_2.shape)
+
+    upconv2 = layers.deconv2D_layer_bn(conv7_2, name='upconv2', kernel_size=(4, 4), strides=(2, 2), num_filters=nlabels,
+                                       training=training)
+    logging.info('upconv2')
+    logging.info(upconv2.shape)
+    skip2_1 = layers.res_net_block(conv2_2, name='skip2_1', num_filters=96, training=training)
+    logging.info('skip2_1')
+    logging.info(skip2_1.shape)
+    skip2_2 = layers.res_net_block(skip2_1, name='skip2_2', num_filters=96, training=training)
+    logging.info('skip2_2')
+    logging.info(skip2_2.shape)
+    concat2 = tf.concat([skip2_2, upconv2], axis=3, name='concat2')
+    logging.info('concat2')
+    logging.info(concat2.shape)
+
+    conv8_1 = layers.conv2D_layer_bn(concat2, 'conv8_1', num_filters=96, training=training)
+    logging.info('conv8_1')
+    logging.info(conv8_1.shape)
+    conv8_2 = layers.conv2D_layer_bn(conv8_1, 'conv8_2', num_filters=96, training=training)
+    logging.info('conv8_2')
+    logging.info(conv8_2.shape)
+
+    upconv1 = layers.deconv2D_layer_bn(conv8_2, name='upconv1', kernel_size=(4, 4), strides=(2, 2), num_filters=nlabels,
+                                       training=training)
+    logging.info('upconv1')
+    logging.info(upconv1.shape)
+    skip1_1 = layers.res_net_block(conv1_2, name='skip1_1', num_filters=48, training=training)
+    logging.info('skip1_1')
+    logging.info(skip1_1.shape)
+    skip1_2 = layers.res_net_block(skip1_1, name='skip1_2', num_filters=48, training=training)
+    logging.info('skip1_2')
+    logging.info(skip1_2.shape)
+    skip1_3 = layers.res_net_block(skip1_2, name='skip1_3', num_filters=48, training=training)
+    logging.info('skip1_3')
+    logging.info(skip1_3.shape)
+    concat1 = tf.concat([skip1_3, upconv1], axis=3, name='concat1')
+    logging.info('concat1')
+    logging.info(concat1.shape)
+
+    conv9_1 = layers.conv2D_layer_bn(concat1, 'conv9_1', num_filters=48, training=training)
+    logging.info('conv9_1')
+    logging.info(conv9_1.shape)
+    conv9_2 = layers.conv2D_layer_bn(conv9_1, 'conv9_2', num_filters=48, training=training)
+    logging.info('conv9_2')
+    logging.info(conv9_2.shape)
+
+    pred = layers.conv2D_layer_bn(conv9_2, 'pred', num_filters=nlabels, kernel_size=(1, 1), activation=tf.identity,
+                                  training=training)
+    logging.info('pred')
+    logging.info(pred.shape)
+
+    return pred
+
+
 def unet2D_light(images, training, nlabels):
     conv1_1 = layers.conv2D_layer_bn(images, 'conv1_1', num_filters=64, training=training)
     logging.info('conv1_1')
