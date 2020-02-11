@@ -9,7 +9,8 @@ import logging
 #experiment_name = 'unet2D_same_mod'
 #experiment_name = 'unet2D_light'
 #experiment_name = 'Dunet2D_same_mod'
-experiment_name = 'Dunet2D_same_mod2'
+#experiment_name = 'Dunet2D_same_mod2'
+experiment_name = 'Dunet2D_same_mod3'
 #experiment_name = 'ENet'
 
 # Model settings Unet2D
@@ -19,7 +20,8 @@ weight_init = 'he_normal'    # xavier_uniform/ xavier_normal/ he_normal /he_unif
 #model_handle = model_structure.unet2D_same_mod
 #model_handle = model_structure.unet2D_light
 #model_handle = model_structure.Dunet2D_same_mod
-model_handle = model_structure.Dunet2D_same_mod2
+#model_handle = model_structure.Dunet2D_same_mod2
+model_handle = model_structure.Dunet2D_same_mod3
 
 # Model settings Enet
 # iniz = tf.contrib.layers.xavier_initializer(uniform=True)  #xavier_uniform
@@ -50,7 +52,7 @@ warmup_training = True
 weight_decay = 0  # enet:2e-4    #unet: 0.00000
 momentum = None
 # loss can be 'weighted_crossentropy'/'crossentropy'/'dice'/'dice_onlyfg'/'crossentropy_and_dice (alfa,beta)'
-loss_type = 'crossentropy_and_dice'
+loss_type = 'weighted_crossentropy'
 alfa = 1     #1      
 beta = 0.2   #1      
 augment_batch = True
