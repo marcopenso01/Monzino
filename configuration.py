@@ -8,8 +8,8 @@ import logging
 #experiment_name = 'unet2D_same'
 #experiment_name = 'unet2D_same_mod'
 #experiment_name = 'unet2D_light'
-experiment_name = 'Dunet2D_same_mod'
-#experiment_name = 'Dunet2D_same_mod2'
+#experiment_name = 'Dunet2D_same_mod'
+experiment_name = 'Dunet2D_same_mod2'
 #experiment_name = 'Dunet2D_same_mod3'
 #experiment_name = 'ENet'
 
@@ -19,8 +19,8 @@ weight_init = 'he_normal'    # xavier_uniform/ xavier_normal/ he_normal /he_unif
 #model_handle = model_structure.unet2D_same
 #model_handle = model_structure.unet2D_same_mod
 #model_handle = model_structure.unet2D_light
-model_handle = model_structure.Dunet2D_same_mod
-#model_handle = model_structure.Dunet2D_same_mod2
+#model_handle = model_structure.Dunet2D_same_mod
+model_handle = model_structure.Dunet2D_same_mod2
 #model_handle = model_structure.Dunet2D_same_mod3
 
 # Model settings Enet
@@ -88,8 +88,8 @@ offset2 = (10,30)           #number of pixels to crop away on each side of the i
 prob = 1                    #Probability [0.0/1.0] (0 no augmentation, 1 always)
 
 # Paths settings (need to mount MyDrive before)
-data_root = '/content/drive/My Drive/Pazienti/train2'      
-test_data_root = '/content/drive/My Drive/Pazieni/test2'
+data_root = '/content/drive/My Drive/Pazienti/train2.1'      
+test_data_root = '/content/drive/My Drive/Pazieni/test2.1'
 preprocessing_folder = '/content/drive/My Drive/preproc_data'     
 project_root = '/content/drive/My Drive'                       
 log_root = os.path.join(project_root, 'acdc_logdir')
