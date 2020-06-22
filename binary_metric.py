@@ -21,6 +21,8 @@ from scipy.stats import pearsonr
 # positive_predictive_value(result, reference) 	Positive predictive value.
 # ravd(result, reference) 	Relative absolute volume difference.
 # f1(result, reference)
+# TP
+# FN
 
 # code
 def dc(result, reference):
@@ -2455,3 +2457,19 @@ def f1(result, reference):
     except ZeroDivisionError:
         f1 = 0.0
     return f1
+
+def TP(result, reference):
+    
+    result = numpy.atleast_1d(result.astype(numpy.bool))
+    reference = numpy.atleast_1d(reference.astype(numpy.bool))
+        
+    tp = numpy.count_nonzero(result & reference)    
+    return tp
+
+def FN(result, reference):
+   
+    result = numpy.atleast_1d(result.astype(numpy.bool))
+    reference = numpy.atleast_1d(reference.astype(numpy.bool))
+    
+    fn = numpy.count_nonzero(~result & reference)
+    return fn
