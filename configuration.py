@@ -40,7 +40,7 @@ split_test_train = True   #divide patients in train and test. If true define spl
 split = 5                 #  2: 50% train and 50% validation,    5: 80% training, 20% validation
 train_on_all_data = False 
 gt_exists = True    #True if it exists the ground_trth images, otherwise False.
-z_dim = 1
+z_dim = 8
 
 # Training settings
 batch_size = 4      #4 
